@@ -1,0 +1,462 @@
+﻿
+@model IEnumerable<_25dh110430_MyStore.Models.Order>
+
+@{
+    ViewBag.Title = "Lịch sử mua hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+
+    /* =========================
+   TOÀN BỘ TRANG LỊCH SỬ
+   ========================= */
+    .history-page {
+        margin-top: 35px;
+        margin-bottom: 50px;
+        padding: 25px;
+        background: #f5f5f5;
+        color: #222;
+    }
+
+    /* =========================
+   TIÊU ĐỀ
+   ========================= */
+    .history-header {
+        margin-bottom: 20px;
+    }
+
+        .history-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #222;
+            margin: 0 0 10px;
+        }
+
+        .history-header p {
+            color: #777;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+    /* =========================
+   BỘ LỌC TRẠNG THÁI
+   ========================= */
+    .filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+        .filter-list a {
+            display: inline-block;
+            padding: 10px 17px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            color: #555;
+            background: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+            .filter-list a:hover,
+            .filter-list a.active {
+                background: #ee4d2d;
+                border-color: #ee4d2d;
+                color: white;
+            }
+
+    /* =========================
+   KHUNG BẢNG
+   ========================= */
+    .history-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 25px;
+        overflow-x: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    /* =========================
+   BẢNG LỊCH SỬ
+   ========================= */
+    .history-table {
+        width: 100%;
+        min-width: 950px;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .history-table thead th {
+            background: #fafafa;
+            color: #555;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 17px 12px;
+            border-bottom: 2px solid #eee;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .history-table tbody td {
+            padding: 18px 12px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .history-table tbody tr {
+            transition: background .2s;
+        }
+
+            .history-table tbody tr:hover {
+                background: #fffaf8;
+            }
+
+            .history-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+    /* =========================
+   MÃ ĐƠN HÀNG
+   ========================= */
+    .order-code {
+        color: #ee4d2d;
+        font-weight: 700;
+    }
+
+    /* =========================
+   TỔNG TIỀN
+   ========================= */
+    .order-price {
+        color: #ee4d2d;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* =========================
+   TRẠNG THÁI ĐƠN HÀNG
+   ========================= */
+    .status-badge {
+        display: inline-block;
+        padding: 8px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Chờ xác nhận */
+    .status-pending {
+        background: #fff4db;
+        color: #c58a13;
+    }
+
+    /* Đã xác nhận */
+    .status-confirmed {
+        background: #e5f3ff;
+        color: #2580c7;
+    }
+
+    /* Đang giao hàng */
+    .status-shipping {
+        background: #e9eaff;
+        color: #5559c9;
+    }
+
+    /* Đã giao hàng */
+    .status-delivered {
+        background: #e2f7ec;
+        color: #168653;
+    }
+
+    /* Đã hủy */
+    .status-cancelled {
+        background: #ffe8e8;
+        color: #d64545;
+    }
+
+    /* =========================
+   NÚT XEM CHI TIẾT
+   ========================= */
+    .btn-detail {
+        display: inline-block;
+        padding: 9px 13px;
+        background: #fff;
+        color: #ee4d2d;
+        border: 1px solid #ee4d2d;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        margin: 3px;
+        transition: .2s;
+    }
+
+        .btn-detail:hover {
+            background: #ee4d2d;
+            border-color: #ee4d2d;
+            color: white;
+            text-decoration: none;
+        }
+
+    /* =========================
+   NÚT HỦY ĐƠN
+   ========================= */
+    .btn-cancel {
+        padding: 9px 13px;
+        background: #fff;
+        color: #d64545;
+        border: 1px solid #d64545;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 700;
+        margin: 3px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .btn-cancel:hover {
+            background: #d64545;
+            color: white;
+        }
+
+    /* =========================
+   ĐƠN HÀNG TRỐNG
+   ========================= */
+    .empty-history {
+        text-align: center;
+        padding: 45px 20px;
+        color: #777;
+    }
+
+        .empty-history i {
+            display: block;
+            font-size: 38px;
+            margin-bottom: 12px;
+            color: #ee4d2d;
+        }
+
+    /* =========================
+   THÔNG BÁO
+   ========================= */
+    .history-page .alert {
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .history-page .alert-success {
+        background: #e2f7ec;
+        color: #168653;
+        border: 1px solid #b8e8ce;
+    }
+
+    .history-page .alert-danger {
+        background: #ffe8e8;
+        color: #d64545;
+        border: 1px solid #f5c2c2;
+    }
+
+    /* =========================
+   RESPONSIVE
+   ========================= */
+    @@media (max-width: 768px) {
+        .history-page {
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        .history-card {
+            padding: 12px;
+        }
+
+        .history-header h2 {
+            font-size: 22px;
+        }
+
+        .filter-list {
+            gap: 8px;
+        }
+
+            .filter-list a {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+    }
+
+</style>
+
+<div class="container">
+    <div class="history-page">
+
+        @* THÔNG BÁO SAU KHI HỦY ĐƠN *@
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="glyphicon glyphicon-ok-circle"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="glyphicon glyphicon-exclamation-sign"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <div class="history-header">
+
+            <div class="history-header">
+                <h2>LỊCH SỬ MUA HÀNG</h2>
+                <p>Theo dõi và quản lý các đơn hàng của bạn</p>
+            </div>
+
+            <div class="filter-list">
+                <a href="@Url.Action("OrderHistory", new { status = "TatCa", searchTerm = ViewBag.SearchTerm })">Tất cả</a>
+                <a href="@Url.Action("OrderHistory", new { status = "Chờ xác nhận", searchTerm = ViewBag.SearchTerm })">Chờ xác nhận</a>
+                <a href="@Url.Action("OrderHistory", new { status = "Đã xác nhận", searchTerm = ViewBag.SearchTerm })">Đã xác nhận</a>
+                <a href="@Url.Action("OrderHistory", new { status = "Đang giao hàng", searchTerm = ViewBag.SearchTerm })">Đang giao hàng</a>
+                <a href="@Url.Action("OrderHistory", new { status = "Đã giao hàng", searchTerm = ViewBag.SearchTerm })">Đã giao hàng</a>
+                <a href="@Url.Action("OrderHistory", new { status = "Đã hủy", searchTerm = ViewBag.SearchTerm })">Đã hủy</a>
+            </div>
+
+            <div class="history-card">
+
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="empty-history">
+                        <i class="glyphicon glyphicon-shopping-cart"></i>
+                        <h4>Chưa có đơn hàng</h4>
+                        <p>Không tìm thấy đơn hàng phù hợp.</p>
+                    </div>
+                }
+                else
+                {
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn hàng</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Thanh toán</th>
+                                <th>Trạng thái</th>
+                                <th>Địa chỉ giao hàng</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="order-code">#@order.OrderID</span>
+                                    </td>
+
+                                    <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+
+                                    <td>
+                                        <span class="order-price">
+                                            @order.TotalAmount.ToString("#,##0", new System.Globalization.CultureInfo("vi-VN")) VNĐ
+                                        </span>
+                                    </td>
+
+                                    <td>@order.PaymentStatus</td>
+
+                                    <td>
+                                        @if (order.OrderStatus == "Chờ xác nhận")
+                                        {
+                                            <span class="status-badge status-pending">Chờ xác nhận</span>
+                                        }
+                                        else if (order.OrderStatus == "Đã xác nhận")
+                                        {
+                                            <span class="status-badge status-confirmed">Đã xác nhận</span>
+                                        }
+                                        else if (order.OrderStatus == "Đang giao hàng")
+                                        {
+                                            <span class="status-badge status-shipping">Đang giao hàng</span>
+                                        }
+                                        else if (order.OrderStatus == "Đã giao hàng")
+                                        {
+                                            <span class="status-badge status-delivered">Đã giao hàng</span>
+                                        }
+                                        else if (order.OrderStatus == "Đã hủy")
+                                        {
+                                            <span class="status-badge status-cancelled">Đã hủy</span>
+                                        }
+
+                                        else
+                                        {
+                                            @order.OrderStatus
+                                        }
+                                    </td>
+
+                                    <td>@order.AddressDelivery</td>
+
+                                    <td>
+                                        @Html.ActionLink(
+                                                           "Xem chi tiết",
+                                                           "OrderSuccess",
+                                                           "Order",
+                                                           new { id = order.OrderID },
+                                                           new { @class = "btn-detail" }
+                                                       )
+
+                                        @if (order.OrderStatus == "Chờ xác nhận")
+                                        {
+                                            <form action="@Url.Action("CancelOrder", "Order")"
+                                                  method="post"
+                                                  style="display:inline;">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@order.OrderID" />
+
+                                                <button type="submit"
+                                                        class="btn-cancel"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                                                    Hủy đơn
+                                                </button>
+                                            </form>
+                                        }
+
+                                        <!--nút đặt lại-->
+                                        @if (order.OrderStatus == "Đã hủy")
+                                        {
+                                            <form action="@Url.Action("Reorder", "Order")"
+                                                  method="post"
+                                                  style="display:inline;">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="id" value="@order.OrderID" />
+
+                                                <button type="submit" class="btn-detail"
+                                                        onclick="return confirm('Bạn muốn đặt lại đơn hàng này?');">
+                                                    <i class="glyphicon glyphicon-repeat"></i>
+                                                    Đặt lại
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,410 @@
+﻿@model _25dh110430_MyStore.Models.Order
+
+@{
+    ViewBag.Title = "OrderSuccess";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+
+    /* =========================
+   TOÀN BỘ TRANG
+   ========================= */
+    .success-page {
+        background: #f5f5f5;
+        padding: 35px 0 60px;
+        color: #222;
+        min-height: 75vh;
+    }
+
+    /* =========================
+   TIÊU ĐỀ VÀ THÔNG BÁO
+   ========================= */
+    .success-title {
+        font-size: 27px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        color: #222;
+    }
+
+    .success-message {
+        color: #168653;
+        font-size: 16px;
+        margin-bottom: 30px;
+        padding: 15px 20px;
+        background: #e2f7ec;
+        border: 1px solid #b8e8ce;
+        border-radius: 4px;
+    }
+
+    /* =========================
+   KHUNG THÔNG TIN ĐƠN HÀNG
+   ========================= */
+    .order-info-box {
+        background: #fff;
+        border: 1px solid #eee;
+        border-top: 3px solid #ee4d2d;
+        border-radius: 4px;
+        padding: 25px 30px;
+        margin-bottom: 35px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    /* Tiêu đề từng khu vực */
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #222;
+        margin: 0 0 22px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #eee;
+    }
+
+    /* Danh sách thông tin */
+    .order-info-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 30px;
+    }
+
+    .order-info-item {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #555;
+    }
+
+        .order-info-item strong {
+            color: #222;
+            font-weight: 600;
+        }
+
+    /* Trạng thái đơn hàng */
+    .order-status {
+        color: #c58a13;
+        font-weight: 700;
+    }
+
+    /* Tổng tiền */
+    .order-total-price {
+        color: #ee4d2d;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    /* =========================
+   BẢNG CHI TIẾT ĐƠN HÀNG
+   ========================= */
+    .order-detail-box {
+        background: #fff;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .success-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+        .success-table thead {
+            background: #fafafa;
+        }
+
+        .success-table th {
+            padding: 16px 15px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #555;
+            border-bottom: 2px solid #eee;
+        }
+
+        .success-table td {
+            padding: 17px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+            vertical-align: middle;
+            color: #444;
+        }
+
+        .success-table tbody tr {
+            transition: background .2s;
+        }
+
+            .success-table tbody tr:hover {
+                background: #fffaf8;
+            }
+
+            .success-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+        .success-table th:not(:first-child),
+        .success-table td:not(:first-child) {
+            text-align: center;
+        }
+
+    /* Tên sản phẩm */
+    .product-name {
+        font-weight: 600;
+        color: #ee4d2d;
+    }
+
+    /* Giá sản phẩm */
+    .product-price {
+        font-weight: 600;
+        color: #555;
+        white-space: nowrap;
+    }
+
+    /* =========================
+   TỔNG TIỀN CUỐI CÙNG
+   ========================= */
+    .order-final-total {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 25px;
+        padding: 20px 15px;
+        background: #fffaf8;
+        border-top: 1px solid #eee;
+        border-bottom: 2px solid #eee;
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+        .order-final-total strong {
+            color: #ee4d2d;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+    /* =========================
+   NÚT ĐIỀU HƯỚNG
+   ========================= */
+    .success-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .success-button {
+        display: inline-block;
+        padding: 13px 25px;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        text-align: center;
+        border: 1px solid #ee4d2d;
+        border-radius: 3px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+    /* Nút về trang chủ */
+    .home-button {
+        background: white;
+        color: #ee4d2d;
+    }
+
+        .home-button:hover {
+            background: #ee4d2d;
+            border-color: #ee4d2d;
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Nút tiếp tục mua hàng */
+    .shopping-button {
+        background: #ee4d2d;
+        color: white;
+        border-color: #ee4d2d;
+    }
+
+        .shopping-button:hover {
+            background: #d73211;
+            border-color: #d73211;
+            color: white;
+            text-decoration: none;
+        }
+
+    /* =========================
+   RESPONSIVE
+   ========================= */
+    @@media (max-width: 768px) {
+        .success-page {
+            padding: 20px 10px 40px;
+        }
+
+        .success-title {
+            font-size: 22px;
+        }
+
+        .order-info-list {
+            grid-template-columns: 1fr;
+        }
+
+        .order-info-box {
+            padding: 20px 15px;
+        }
+
+        .order-detail-box {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .success-table {
+            min-width: 600px;
+        }
+
+        .success-actions {
+            flex-direction: column;
+        }
+
+        .success-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .order-final-total {
+            gap: 12px;
+            font-size: 15px;
+        }
+
+            .order-final-total strong {
+                font-size: 19px;
+            }
+    }
+
+</style>
+
+<div class="success-page">
+    <div class="container">
+
+        <h2 class="success-title">
+            XÁC NHẬN ĐƠN HÀNG
+        </h2>
+
+        <p class="success-message">
+            Đơn hàng của bạn đã được ghi nhận. Cảm ơn bạn đã mua sắm!
+        </p>
+
+        <!-- THÔNG TIN ĐƠN HÀNG -->
+        <div class="order-info-box">
+
+            <h3 class="section-title">
+                THÔNG TIN ĐƠN HÀNG
+            </h3>
+
+            <div class="order-info-list">
+
+                <div class="order-info-item">
+                    <strong>Mã đơn hàng:</strong>
+                    @Model.OrderID
+                </div>
+
+                <div class="order-info-item">
+                    <strong>Ngày đặt hàng:</strong>
+                    @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                </div>
+
+                <div class="order-info-item">
+                    <strong>Trạng thái thanh toán:</strong>
+                    <span class="order-status">
+                        @Model.PaymentStatus
+                    </span>
+                </div>
+
+                <div class="order-info-item">
+                    <strong>Địa chỉ giao hàng:</strong>
+                    @Model.AddressDelivery
+                </div>
+
+            </div>
+
+            <div class="order-final-total">
+                <span>Tổng số tiền:</span>
+
+                <strong>
+                    @Model.TotalAmount.ToString("N0") VNĐ
+                </strong>
+            </div>
+
+        </div>
+
+        <!-- CHI TIẾT ĐƠN HÀNG -->
+        <div class="order-detail-box">
+
+            <h3 class="section-title">
+                CHI TIẾT ĐƠN HÀNG
+            </h3>
+
+            <table class="success-table">
+
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Màu sắc</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Tổng giá</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+                            <td>@item.Product.ProductName</td>
+
+                            <td>
+                                @(item.ProductColor != null
+                    ? item.ProductColor.ColorName
+                    : "Chưa chọn")
+                            </td>
+
+                            <td>@item.Quantity</td>
+
+                            <td>@item.UnitPrice.ToString("N0") VNĐ</td>
+
+                            <td>
+                                @((item.Quantity * item.UnitPrice).ToString("N0")) VNĐ
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- NÚT ĐIỀU HƯỚNG -->
+        <div class="success-actions">
+
+            @Html.ActionLink(
+                     "← QUAY VỀ TRANG CHỦ",
+                     "Index",
+                     "Home",
+                     null,
+                     new { @class = "success-button home-button" })
+
+            @Html.ActionLink(
+                     "TIẾP TỤC MUA SẮM",
+                     "Index",
+                     "Home",
+                     null,
+                     new { @class = "success-button shopping-button" })
+
+        </div>
+
+    </div>
+</div>

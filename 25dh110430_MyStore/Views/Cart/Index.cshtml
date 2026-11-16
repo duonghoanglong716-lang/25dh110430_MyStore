@@ -1,0 +1,534 @@
+﻿@model _25dh110430_MyStore.Models.ViewModel.Cart
+
+@{
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    /* ===== TRANG GIỎ HÀNG SHOPEE ===== */
+
+    .cart-page {
+        background: #f5f5f5;
+        padding: 25px 0 100px;
+        color: #222;
+        min-height: 75vh;
+    }
+
+        .cart-page h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #ee4d2d;
+        }
+
+    /* BỐ CỤC TOÀN TRANG */
+    .cart-row {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        gap: 15px;
+    }
+
+    .cart-left {
+        width: 100%;
+        padding: 0;
+    }
+
+    .cart-right {
+        width: 100%;
+        padding: 20px;
+        border: none;
+        background: #fff;
+        margin-top: 0;
+    }
+
+    /* BẢNG SẢN PHẨM */
+    .cart-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        background: transparent;
+        table-layout: auto;
+    }
+
+        /* TIÊU ĐỀ CÁC CỘT */
+        .cart-table th {
+            background: #fff;
+            color: #777;
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: none;
+            padding: 20px 12px;
+            border: none;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+            .cart-table th:first-child {
+                text-align: left;
+            }
+
+        /* Ô SẢN PHẨM */
+        .cart-table td {
+            background: #fff;
+            padding: 18px 12px;
+            border-top: 1px solid #f1f1f1;
+            border-bottom: 1px solid #f1f1f1;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 14px;
+        }
+
+            .cart-table td:first-child {
+                border-left: 1px solid #f1f1f1;
+            }
+
+            .cart-table td:last-child {
+                border-right: 1px solid #f1f1f1;
+            }
+
+    /* THÔNG TIN SẢN PHẨM */
+    .cart-product {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+        min-width: 250px;
+    }
+
+        .cart-product img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .cart-product a {
+            color: #222;
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+            .cart-product a:hover {
+                color: #ee4d2d;
+            }
+
+    /* GIÁ SẢN PHẨM */
+    .cart-price {
+        color: #ee4d2d;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* SỐ LƯỢNG */
+    .quantity-control {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        height: 36px;
+        background: #fff;
+    }
+
+        .quantity-control button {
+            width: 32px;
+            height: 34px;
+            border: none;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            .quantity-control button:hover {
+                color: #ee4d2d;
+            }
+
+        .quantity-control input {
+            width: 42px;
+            height: 34px;
+            border: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            background: white;
+            font-size: 14px;
+        }
+
+    /* XÓA SẢN PHẨM */
+    .remove-product {
+        color: #222;
+        font-size: 14px;
+        text-decoration: none;
+        border: none;
+        border-radius: 0;
+        width: auto;
+        height: auto;
+        display: inline-block;
+    }
+
+        .remove-product:hover {
+            color: #ee4d2d;
+            border: none;
+            text-decoration: none;
+        }
+
+    /* CÁC NÚT CHỨC NĂNG */
+    .cart-actions {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .continue-button,
+    .update-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: none;
+        text-decoration: none;
+        border: 1px solid #ee4d2d;
+        border-radius: 2px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .continue-button {
+        color: #ee4d2d;
+        background: white;
+    }
+
+        .continue-button:hover {
+            background: #fff5f2;
+            color: #ee4d2d;
+            text-decoration: none;
+        }
+
+    .update-button {
+        color: white;
+        background: #ee4d2d;
+        border-color: #ee4d2d;
+    }
+
+        .update-button:hover {
+            background: #d73211;
+        }
+
+    /* TỔNG KẾT GIỎ HÀNG */
+    .cart-summary {
+        width: 100%;
+        background: #fff;
+    }
+
+        .cart-summary h3 {
+            font-size: 17px;
+            font-weight: 500;
+            text-transform: none;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-top: 0;
+        }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+        .summary-line strong {
+            font-weight: 500;
+        }
+
+    .summary-total {
+        border-bottom: none;
+        font-size: 17px;
+    }
+
+        .summary-total strong {
+            color: #ee4d2d;
+            font-size: 22px;
+        }
+
+    /* THÔNG TIN VẬN CHUYỂN */
+    .shipping-info {
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        color: #777;
+        font-size: 14px;
+        text-align: right;
+    }
+
+        .shipping-info p {
+            margin-bottom: 8px;
+        }
+
+    /* NÚT MUA HÀNG */
+    .checkout-button {
+        display: block;
+        width: 100%;
+        max-width: 240px;
+        padding: 13px 10px;
+        margin: 20px 0 0 auto;
+        background: #ee4d2d;
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        text-align: center;
+        text-decoration: none;
+        text-transform: none;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+        .checkout-button:hover {
+            background: #d73211;
+            color: white;
+            text-decoration: none;
+        }
+
+    /* GIỎ HÀNG TRỐNG */
+    .empty-cart {
+        background: #fff;
+        text-align: center;
+        padding: 50px 15px;
+        font-size: 16px;
+    }
+
+        .empty-cart .continue-button {
+            margin-top: 15px;
+        }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .cart-page {
+            padding: 15px 0 50px;
+        }
+
+        .cart-left,
+        .cart-right {
+            width: 100%;
+            padding: 12px;
+        }
+
+        .cart-left {
+            overflow-x: auto;
+        }
+
+        .cart-table {
+            min-width: 750px;
+        }
+
+        .cart-product {
+            min-width: 230px;
+        }
+
+        .cart-actions {
+            flex-direction: column;
+        }
+
+        .continue-button,
+        .update-button {
+            width: 100%;
+        }
+
+        .checkout-button {
+            max-width: 100%;
+        }
+    }
+
+</style>
+
+<script>
+    function cartUpdateQuantity(id, newQuantity) {
+        if (newQuantity < 1) return;
+
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = '@Url.Action("UpdateQuantity", "Cart")';
+
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        idInput.value = id;
+        form.appendChild(idInput);
+
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = newQuantity;
+        form.appendChild(quantityInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+
+<div class="cart-page">
+    <div class="container">
+
+        <h2>GIỎ HÀNG</h2>
+
+        @if (Model == null || !Model.Items.Any())
+        {
+            <div class="empty-cart">
+                <p>Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
+
+                @Html.ActionLink(
+                    "TIẾP TỤC MUA HÀNG",
+                    "Index",
+                    "Home",
+                    null,
+                    new { @class = "continue-button" })
+            </div>
+        }
+        else
+        {
+            <div class="cart-row">
+
+                <!-- CỘT TRÁI: DANH SÁCH SẢN PHẨM -->
+                <div class="cart-left">
+
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th>Tạm tính</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var categoryGroup in Model.GroupedItems)
+                            {
+                                foreach (var item in categoryGroup)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="cart-product">
+
+                                                <a href="@Url.Action(
+                                                    "RemoveFromCart",
+                                                    "Cart",
+                                                    new { id = item.ProductID })"
+                                                   class="remove-product"
+                                                   title="Xóa sản phẩm">×</a>
+
+                                                <img src="@item.ProductImage"
+                                                     alt="@item.ProductName" />
+
+                                                <a href="#">
+                                                    @item.ProductName
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                        <td class="cart-price">
+                                            @item.UnitPrice.ToString("N0") VNĐ
+                                        </td>
+
+                                        <td>
+                                            <div class="quantity-control">
+
+                                                <button type="button"
+                                                        onclick="cartUpdateQuantity(
+                                                            @item.ProductID,
+                                                            @item.Quantity - 1)">
+                                                    -
+                                                </button>
+
+                                                <input type="number"
+                                                       value="@item.Quantity"
+                                                       readonly />
+
+                                                <button type="button"
+                                                        onclick="cartUpdateQuantity(
+                                                            @item.ProductID,
+                                                            @item.Quantity + 1)">
+                                                    +
+                                                </button>
+
+                                            </div>
+                                        </td>
+
+                                        <td class="cart-price">
+                                            @item.TotalPrice.ToString("N0") VNĐ
+                                        </td>
+
+                                        <td></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="cart-actions">
+
+                        @Html.ActionLink(
+                            "← TIẾP TỤC XEM SẢN PHẨM",
+                            "Index",
+                            "Home",
+                            null,
+                            new { @class = "continue-button" })
+
+                        <a href="@Url.Action("ClearCart", "Cart")"
+                           class="update-button"
+                           onclick="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')">
+                            XÓA GIỎ HÀNG
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: TỔNG GIỎ HÀNG -->
+                <div class="cart-right">
+
+                    <div class="cart-summary">
+
+                        <h3>TỔNG CỘNG GIỎ HÀNG</h3>
+
+                        <div class="summary-line">
+                            <span>Tạm tính</span>
+
+                            <strong>
+                                @Model.TotalValue().ToString("N0") VNĐ
+                            </strong>
+                        </div>
+
+                        <div class="shipping-info">
+                            <p>Giao hàng</p>
+                            <p>Phí giao hàng sẽ được tính khi thanh toán.</p>
+                        </div>
+
+                        <div class="summary-line summary-total">
+                            <span>Tổng</span>
+
+                            <strong>
+                                @Model.TotalValue().ToString("N0") VNĐ
+                            </strong>
+                        </div>
+
+                        @Html.ActionLink(
+                            "TIẾN HÀNH THANH TOÁN",
+                            "Checkout",
+                            "Order",
+                            null,
+                            new { @class = "checkout-button" })
+
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>

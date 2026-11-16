@@ -1,0 +1,568 @@
+﻿
+@model _25dh110430_MyStore.Models.ViewModel.CheckoutVM
+
+@{
+    ViewBag.Title = "Đặt hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    /* =========================
+   TOÀN BỘ TRANG THANH TOÁN
+   ========================= */
+    .checkout-page {
+        background: #f5f5f5;
+        padding: 30px 0 60px;
+        color: #222;
+        min-height: 75vh;
+    }
+
+    /* Chia hai cột */
+    .checkout-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+    }
+
+    /* Cột trái */
+    .checkout-left {
+        width: 58.3333%;
+        padding: 0 30px 0 15px;
+    }
+
+    /* Cột phải */
+    .checkout-right {
+        width: 41.6667%;
+        padding: 25px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        height: fit-content;
+        box-sizing: border-box;
+    }
+
+    /* =========================
+   TIÊU ĐỀ
+   ========================= */
+    .checkout-title {
+        font-size: 23px;
+        font-weight: 700;
+        margin: 25px 0;
+        color: #222;
+        text-transform: uppercase;
+    }
+
+    /* Thông báo mã giảm giá */
+    .coupon-notice {
+        font-size: 16px;
+        padding: 18px 20px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-left: 3px solid #ee4d2d;
+        margin-bottom: 25px;
+        border-radius: 4px;
+    }
+
+        .coupon-notice a {
+            color: #ee4d2d;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .coupon-notice a:hover {
+                color: #d73211;
+                text-decoration: underline;
+            }
+
+    /* =========================
+   THÔNG TIN GIAO HÀNG
+   ========================= */
+    .address-edit {
+        display: inline-block;
+        color: #ee4d2d;
+        margin-bottom: 18px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .address-edit:hover {
+            color: #d73211;
+            text-decoration: underline;
+        }
+
+    .checkout-form-group {
+        margin-bottom: 22px;
+    }
+
+        .checkout-form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #333;
+        }
+
+    /* Ô nhập liệu */
+    .checkout-input {
+        width: 100%;
+        height: 46px;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        background: #fff;
+        font-size: 15px;
+        color: #333;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+
+        .checkout-input:focus {
+            outline: none;
+            border-color: #ee4d2d;
+            box-shadow: 0 0 0 2px rgba(238,77,45,0.08);
+        }
+
+        .checkout-input[readonly] {
+            background: #f7f7f7;
+            color: #777;
+        }
+
+    .validation-message {
+        color: #ee4d2d;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    /* =========================
+   BẢNG SẢN PHẨM
+   ========================= */
+    .order-box {
+        background: #fff;
+        padding: 22px;
+        margin-top: 25px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
+
+        .order-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0 0 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ee4d2d;
+            color: #222;
+        }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .order-table th {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+            .order-table th:last-child,
+            .order-table td:last-child {
+                text-align: right;
+            }
+
+        .order-table td {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #444;
+        }
+
+    .order-product-name {
+        color: #555;
+    }
+
+    .order-price {
+        font-weight: 700;
+        color: #ee4d2d;
+        white-space: nowrap;
+    }
+
+    /* =========================
+   TỔNG TIỀN
+   ========================= */
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+    }
+
+        .order-total strong {
+            font-weight: 700;
+        }
+
+    .order-grand-total {
+        border-bottom: 2px solid #eee;
+        font-size: 17px;
+    }
+
+        .order-grand-total strong {
+            color: #ee4d2d;
+            font-size: 21px;
+        }
+
+    /* =========================
+   ĐẾM KÝ TỰ GHI CHÚ
+   ========================= */
+    .note-counter {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 13px;
+        color: #888;
+    }
+
+        .note-counter.limit-reached {
+            color: #ee4d2d;
+            font-weight: bold;
+        }
+
+    /* =========================
+   PHƯƠNG THỨC GIAO HÀNG
+   ========================= */
+    .shipping-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+        background: #fffaf8;
+        border: 1px solid #f5d5cc;
+        border-radius: 4px;
+    }
+
+        .shipping-options label {
+            font-weight: 400;
+            cursor: pointer;
+            color: #444;
+        }
+
+        .shipping-options input {
+            accent-color: #ee4d2d;
+            cursor: pointer;
+        }
+
+    /* =========================
+   GHI CHÚ
+   ========================= */
+    .checkout-note {
+        width: 100%;
+        min-height: 110px;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-sizing: border-box;
+        font-size: 15px;
+        resize: vertical;
+    }
+
+        .checkout-note:focus {
+            outline: none;
+            border-color: #ee4d2d;
+            box-shadow: 0 0 0 2px rgba(238,77,45,0.08);
+        }
+
+    /* =========================
+   NÚT ĐẶT HÀNG
+   ========================= */
+    .place-order-button {
+        width: 100%;
+        padding: 15px;
+        margin-top: 25px;
+        background: #ee4d2d;
+        border: 1px solid #ee4d2d;
+        border-radius: 3px;
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .place-order-button:hover {
+            background: #d73211;
+            border-color: #d73211;
+        }
+
+    /* =========================
+   THÔNG TIN BẢO MẬT
+   ========================= */
+    .privacy-notice {
+        font-size: 13px;
+        line-height: 1.7;
+        margin-top: 22px;
+        color: #777;
+    }
+
+    /* =========================
+   HIỆU ỨNG
+   ========================= */
+    .checkout-right,
+    .order-box {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    /* =========================
+   RESPONSIVE
+   ========================= */
+    @@media (max-width: 768px) {
+        .checkout-left,
+        .checkout-right {
+            width: 100%;
+            padding: 15px;
+        }
+
+        .checkout-right {
+            margin-top: 25px;
+        }
+
+        .checkout-title {
+            font-size: 20px;
+        }
+
+        .order-box {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .order-table {
+            min-width: 400px;
+        }
+
+        .place-order-button {
+            font-size: 16px;
+        }
+    }
+
+</style>
+
+<script>
+    function enableAddressEdit() {
+        document.getElementById("newAddressGroup").style.display = "block";
+
+        document.getElementById("newShippingAddress").focus();
+    }
+
+    function updateShippingAddress() {
+        var newAddress = document
+            .getElementById("newShippingAddress").value.trim();
+
+        if (newAddress === "") {
+            alert("Vui lòng nhập địa chỉ giao hàng mới!");
+            return;
+        }
+
+        document.getElementById("shippingAddress").value = newAddress;
+
+        // Ẩn phần nhập địa chỉ mới
+        document.getElementById("newAddressGroup").style.display = "none";
+
+        alert("Đã cập nhật địa chỉ giao hàng!");
+    }
+</script>
+
+<div class="checkout-page">
+    <div class="container">
+
+        @using (Html.BeginForm(
+            "Checkout",
+            "Order",
+            FormMethod.Post,
+            new { role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(
+                false,
+                "",
+                new { @class = "validation-message" })
+
+            <div class="checkout-row">
+
+                <!-- CỘT TRÁI: THÔNG TIN GIAO HÀNG -->
+                <div class="checkout-left">
+
+                    <div class="coupon-notice">
+                        Bạn có mã ưu đãi?
+                        <a href="javascript:void(0)">
+                            Ấn vào đây để nhập mã
+                        </a>
+                    </div>
+
+                    <h2 class="checkout-title">
+                        THÔNG TIN THANH TOÁN
+                    </h2>
+
+                    <a href="javascript:void(0)"
+                       class="address-edit"
+                       onclick="enableAddressEdit()">
+                        + Lấy địa chỉ từ thông tin mua hàng trước đây
+                    </a>
+
+                    <div class="checkout-form-group"
+                         id="newAddressGroup"
+                         style="display:none;">
+
+                        <label>Địa chỉ mới</label>
+
+                        <input type="text"
+                               id="newShippingAddress"
+                               class="checkout-input"
+                               placeholder="Nhập địa chỉ giao hàng mới" />
+
+                        <button type="button"
+                                class="btn btn-success"
+                                onclick="updateShippingAddress()">
+                            Xác nhận địa chỉ
+                        </button>
+                    </div>
+
+                    <div class="checkout-form-group"
+                         id="newAddressGroup"
+                         style="display:none;">
+
+                        <label>Địa chỉ mới</label>
+
+                        <input type="text"
+                               id="newShippingAddress"
+                               class="checkout-input"
+                               placeholder="Nhập địa chỉ giao hàng mới" />
+                    </div>
+
+                    <h2 class="checkout-title">
+                        THÔNG TIN GIAO HÀNG
+                    </h2>
+
+                    <div class="checkout-form-group">
+                        <label>Phương thức giao hàng *</label>
+
+                        <div class="shipping-options">
+                            <label>
+                                @Html.RadioButtonFor(
+                                    m => m.ShippingMethod,
+                                    "Giao hàng nhanh")
+                                Giao hàng nhanh
+                            </label>
+
+                            <label>
+                                @Html.RadioButtonFor(
+                                    m => m.ShippingMethod,
+                                    "Giao hàng tiết kiệm")
+                                Giao hàng tiết kiệm
+                            </label>
+                        </div>
+
+                      
+                    </div>
+
+                    <h2 class="checkout-title">
+                        THÔNG TIN BỔ SUNG
+                    </h2>
+
+                    <div class="checkout-form-group">
+                        <label>Ghi chú đơn hàng (tùy chọn)</label>
+
+                        <textarea id="checkoutNote"
+                                  name="Note"
+                                  class="checkout-note"
+                                  maxlength="250"
+                                  placeholder="Ghi chú thêm về đơn hàng (tối đa 250 ký tự)"
+                                  oninput="updateNoteCount()"></textarea>
+
+                        <div class="note-counter">
+                            <span id="noteMessage">Bạn có thể nhập tối đa 250 ký tự.</span>
+                            <span id="noteCount">0/250</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CỘT PHẢI: ĐƠN HÀNG -->
+                <div class="checkout-right">
+
+                    <div class="order-box">
+
+                        <h3>ĐƠN HÀNG CỦA BẠN</h3>
+
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Tạm tính</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.CartItems)
+                                {
+                                    <tr>
+                                        <td class="order-product-name">
+                                            @item.ProductName
+                                            <strong> × @item.Quantity</strong>
+                                        </td>
+
+                                        <td class="order-price">
+                                            @item.TotalPrice.ToString("N0") VNĐ
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="order-total">
+                            <strong>Tạm tính</strong>
+
+                            <strong>
+                                @Model.TotalAmount.ToString("N0") VNĐ
+                            </strong>
+                        </div>
+
+                        <div class="order-total">
+                            <span>Shipment</span>
+                            <span>Giao hàng sẽ được xác định</span>
+                        </div>
+
+                        <div class="order-total order-grand-total">
+                            <strong>Tổng</strong>
+
+                            <strong>
+                                @Model.TotalAmount.ToString("N0") VNĐ
+                            </strong>
+                        </div>
+
+                     
+
+                    <button type="submit" class="place-order-button">
+                        ĐẶT HÀNG
+                    </button>
+
+                        <p class="privacy-notice">
+                            Thông tin cá nhân của bạn sẽ được sử dụng
+                            để xử lý đơn hàng và nâng cao trải nghiệm
+                            sử dụng website.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>

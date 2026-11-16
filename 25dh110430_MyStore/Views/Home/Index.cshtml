@@ -1,0 +1,707 @@
+﻿
+@model _25dh110430_MyStore.Models.HomeProductVM
+
+@{
+    ViewBag.Title = "Trang chủ MyStore";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+        /* =====================================
+       TỔNG QUAN TRANG CHỦ
+    ===================================== */
+
+        body {
+            background: #f5f5f5;
+            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .bsg-main-wrapper {
+            background: #f5f5f5;
+        }
+
+        .bsg-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* =====================================
+       BANNER QUẢNG CÁO
+    ===================================== */
+
+        .banner-slider {
+            position: relative;
+            width: 100%;
+            max-width: 1366px;
+            height: 260px;
+            margin: 12px auto 0;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .banner-slide {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+            .banner-slide.active {
+                display: block;
+            }
+
+            .banner-slide::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient( 90deg, rgba(0,0,0,.45), rgba(0,0,0,.05) );
+            }
+
+            .banner-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        /* Nội dung Banner */
+
+        .banner-content {
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 6%;
+            transform: translateY(-50%);
+            color: white;
+            max-width: 520px;
+        }
+
+            .banner-content h1 {
+                font-size: 30px;
+                font-weight: 700;
+                margin: 0 0 12px;
+                text-shadow: 1px 2px 4px rgba(0,0,0,.3);
+            }
+
+            .banner-content p {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+
+        .banner-btn {
+            display: inline-block;
+            background: #ee4d2d;
+            color: #fff !important;
+            padding: 11px 25px;
+            border-radius: 3px;
+            text-decoration: none !important;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+            .banner-btn:hover {
+                background: #d73211;
+            }
+
+        /* Nút chuyển Banner */
+
+        .banner-prev,
+        .banner-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,.85);
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .banner-prev {
+            left: 12px;
+        }
+
+        .banner-next {
+            right: 12px;
+        }
+
+            .banner-prev:hover,
+            .banner-next:hover {
+                background: #fff;
+                color: #ee4d2d;
+            }
+
+        /* Chấm chuyển Banner */
+
+        .banner-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            gap: 8px;
+        }
+
+        .banner-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.6);
+            cursor: pointer;
+        }
+
+            .banner-dot.active {
+                background: #ee4d2d;
+            }
+
+        /* =====================================
+       TÌM KIẾM SẢN PHẨM
+    ===================================== */
+
+        .searchProd {
+            max-width: 1366px;
+            margin: 0 auto 20px;
+            padding: 25px 15px 30px;
+            background: #fff;
+            text-align: center;
+        }
+
+            .searchProd h2 {
+                color: #ee4d2d;
+                font-size: 25px;
+                font-weight: 500;
+                margin: 0 0 22px;
+            }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 46px;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 3px 0 0 3px;
+            outline: none;
+            font-size: 15px;
+            box-shadow: none;
+        }
+
+            .search-input:focus {
+                border-color: #ee4d2d;
+            }
+
+        .search-button {
+            min-width: 125px;
+            height: 46px;
+            border: none;
+            border-radius: 0 3px 3px 0;
+            background: #ee4d2d;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+            .search-button:hover {
+                background: #d73211;
+            }
+
+        /* =====================================
+       KHUNG SẢN PHẨM
+    ===================================== */
+
+        .feature-container,
+        .list-container {
+            width: 100%;
+            max-width: 1366px;
+            margin: 0 auto 25px;
+            padding: 15px;
+            background: #fff;
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+            /* =====================================
+       CARD SẢN PHẨM
+    ===================================== */
+
+            .feature-container .product-item,
+            .list-container .product-item {
+                width: 100%;
+                min-width: 0;
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                padding: 8px !important;
+                margin: 0 !important;
+                background: #fff !important;
+                border: 1px solid transparent !important;
+                border-radius: 2px !important;
+                box-shadow: none !important;
+                overflow: hidden;
+                box-sizing: border-box;
+                transition: all .2s ease;
+            }
+
+                /* Hiệu ứng Hover */
+
+                .feature-container .product-item:hover,
+                .list-container .product-item:hover {
+                    border-color: #ee4d2d !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,.12) !important;
+                    transform: translateY(-2px);
+                }
+
+                /* =====================================
+       HÌNH ẢNH SẢN PHẨM
+    ===================================== */
+
+                .feature-container .product-item img,
+                .list-container .product-item img {
+                    width: 100% !important;
+                    height: 190px !important;
+                    object-fit: contain !important;
+                    background: #fff !important;
+                    display: block;
+                    margin: 0 auto !important;
+                    transition: transform .25s ease;
+                }
+
+                .feature-container .product-item:hover img,
+                .list-container .product-item:hover img {
+                    transform: scale(1.04);
+                }
+
+            /* =====================================
+       TÊN SẢN PHẨM
+    ===================================== */
+
+            .feature-container .prodName,
+            .list-container .prodName {
+                padding: 0 5px !important;
+                margin: 10px 0 5px !important;
+                min-height: 40px;
+                color: #222 !important;
+                font-size: 14px !important;
+                font-weight: 400 !important;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* =====================================
+       GIÁ SẢN PHẨM
+    ===================================== */
+
+            .feature-container .prodPrice,
+            .list-container .prodPrice {
+                padding: 0 5px !important;
+                margin: 8px 0 !important;
+                color: #ee4d2d !important;
+                font-size: 18px !important;
+                font-weight: 500 !important;
+            }
+
+            /* =====================================
+       DANH MỤC SẢN PHẨM
+    ===================================== */
+
+            .feature-container .prodCate,
+            .list-container .prodCate {
+                padding: 0 5px !important;
+                margin: 5px 0 !important;
+                color: #888 !important;
+                font-size: 12px !important;
+            }
+
+            /* =====================================
+       SỐ LƯỢNG ĐÃ BÁN
+    ===================================== */
+
+            .feature-container .prodSale,
+            .list-container .prodSale {
+                padding: 0 5px !important;
+                margin: 5px 0 10px !important;
+                color: #888 !important;
+                font-size: 12px !important;
+            }
+
+            /* Link sản phẩm */
+
+            .feature-container .product-item a,
+            .list-container .product-item a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+        /* =====================================
+       ĐƯỜNG PHÂN CÁCH
+    ===================================== */
+
+        hr {
+            max-width: 1366px;
+            border-top: 1px solid #ddd;
+            margin: 20px auto;
+        }
+
+        /* =====================================
+       RESPONSIVE - TABLET
+    ===================================== */
+
+        @@media (max-width: 1100px) {
+
+            .feature-container,
+            .list-container {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 768px) {
+
+            .banner-slider {
+                height: 200px;
+            }
+
+            .banner-content h1 {
+                font-size: 22px;
+            }
+
+            .banner-content p {
+                font-size: 13px;
+            }
+
+            .feature-container,
+            .list-container {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        /* =====================================
+       RESPONSIVE - MOBILE
+    ===================================== */
+
+        @@media (max-width: 480px) {
+
+            .banner-slider {
+                height: 160px;
+            }
+
+            .banner-content {
+                left: 5%;
+                right: 5%;
+            }
+
+                .banner-content h1 {
+                    font-size: 17px;
+                }
+
+                .banner-content p {
+                    font-size: 11px;
+                    margin-bottom: 10px;
+                }
+
+            .banner-btn {
+                padding: 7px 13px;
+                font-size: 12px;
+            }
+
+            .searchProd {
+                padding: 20px 10px;
+            }
+
+                .searchProd h2 {
+                    font-size: 21px;
+                }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .search-input {
+                font-size: 12px;
+            }
+
+            .search-button {
+                min-width: 85px;
+                font-size: 13px;
+            }
+
+            .feature-container,
+            .list-container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                padding: 8px;
+                gap: 8px;
+            }
+
+                .feature-container .product-item img,
+                .list-container .product-item img {
+                    height: 145px !important;
+                }
+
+                .feature-container .prodPrice,
+                .list-container .prodPrice {
+                    font-size: 16px !important;
+                }
+        }
+</style>
+
+
+<!-- =====================================
+     BANNER QUẢNG CÁO
+===================================== -->
+
+<div class="banner-slider">
+
+    <!-- Banner 1 -->
+    <div class="banner-slide active">
+
+        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1600&q=80"
+             alt="Balo du lịch">
+
+        <div class="banner-content">
+
+            <h1>BỘ SƯU TẬP BALO DU LỊCH 2026</h1>
+
+            <p>
+                Khám phá bộ sưu tập mới.
+                Ưu đãi lên đến 30%.
+            </p>
+
+            <a href="@Url.Action("Index", "Home")"
+               class="banner-btn">
+                MUA NGAY
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Banner 2 -->
+    <div class="banner-slide">
+
+        <img src="https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=1600&q=80"
+             alt="Balo laptop">
+
+        <div class="banner-content">
+
+            <h1>BALO LAPTOP CAO CẤP</h1>
+
+            <p>
+                Thiết kế hiện đại.
+                Bảo vệ laptop an toàn.
+            </p>
+
+            <a href="@Url.Action("Index", "Home")"
+               class="banner-btn">
+                KHÁM PHÁ NGAY
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Banner 3 -->
+    <div class="banner-slide">
+
+        <img src="https://images.unsplash.com/photo-1581605405669-fcdf81165afa?auto=format&fit=crop&w=1600&q=80"
+             alt="Balo thời trang">
+
+        <div class="banner-content">
+
+            <h1>PHONG CÁCH CỦA BẠN</h1>
+
+            <p>
+                Khám phá những mẫu balo
+                thời trang mới nhất.
+            </p>
+
+            <a href="@Url.Action("Index", "Home")"
+               class="banner-btn">
+                XEM SẢN PHẨM
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Nút chuyển Banner -->
+
+    <button type="button"
+            class="banner-prev"
+            onclick="changeBanner(-1)">
+        &#10094;
+    </button>
+
+    <button type="button"
+            class="banner-next"
+            onclick="changeBanner(1)">
+        &#10095;
+    </button>
+
+
+    <!-- Dấu chấm Banner -->
+
+    <div class="banner-dots">
+
+        <span class="banner-dot active"
+              onclick="showBanner(0)">
+        </span>
+
+        <span class="banner-dot"
+              onclick="showBanner(1)">
+        </span>
+
+        <span class="banner-dot"
+              onclick="showBanner(2)">
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     TÌM KIẾM SẢN PHẨM
+===================================== -->
+
+<section class="searchProd">
+
+    <h2>Tìm kiếm sản phẩm</h2>
+
+    @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+    {
+        <div class="form-group search-container">
+
+            @Html.TextBoxFor(m => m.SearchTerm, new
+            {
+                @class = "search-input",
+                placeholder = "Nhập tên, mô tả hoặc chủng loại sản phẩm"
+            })
+
+            <button type="submit" class="search-button">
+
+                <i class="fas fa-search"></i>
+
+                Tìm kiếm
+
+            </button>
+
+        </div>
+    }
+
+</section>
+
+
+<hr />
+
+
+<!-- =====================================
+     SẢN PHẨM NỔI BẬT
+===================================== -->
+
+@Html.Partial("_PVFeatureProduct", Model)
+
+
+<!-- =====================================
+     SẢN PHẨM MỚI
+===================================== -->
+
+@Html.Partial("_PVNewProduct", Model)
+
+
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var currentBanner = 0;
+
+            var banners = document.querySelectorAll(".banner-slide");
+
+            var dots = document.querySelectorAll(".banner-dot");
+
+            var timer = null;
+
+            // Kiểm tra Banner
+            if (banners.length === 0) {
+                return;
+            }
+
+            // Hiển thị Banner
+            function showBannerInternal(index) {
+
+                banners[currentBanner].classList.remove("active");
+
+                if (dots[currentBanner]) {
+                    dots[currentBanner].classList.remove("active");
+                }
+
+                currentBanner = (index + banners.length) % banners.length;
+
+                banners[currentBanner].classList.add("active");
+
+                if (dots[currentBanner]) {
+                    dots[currentBanner].classList.add("active");
+                }
+
+            }
+
+            // Chuyển Banner bằng nút
+            window.showBanner = function (index) {
+
+                showBannerInternal(index);
+
+                resetTimer();
+
+            };
+
+            // Chuyển Banner trước / sau
+            window.changeBanner = function (direction) {
+
+                showBannerInternal(currentBanner + direction);
+
+                resetTimer();
+
+            };
+
+            // Tự động chuyển Banner
+            function resetTimer() {
+
+                clearInterval(timer);
+
+                timer = setInterval(function () {
+
+                    showBannerInternal(currentBanner + 1);
+
+                }, 4000);
+
+            }
+
+            resetTimer();
+
+        });
+
+    </script>
+
+}

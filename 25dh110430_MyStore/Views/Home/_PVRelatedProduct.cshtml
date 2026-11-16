@@ -1,0 +1,28 @@
+﻿@model _25dh110430_MyStore.Models.ViewModel.ProductDetailsVM
+
+<link rel="stylesheet" href="~/Content/myStyle/CustomerHome.css" />
+
+@if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
+{
+    <ul class="list-container">
+        @foreach (var product in Model.RelatedProducts)
+        {
+            <li class="fproduct-item">
+                <a href="@Url.Action("ProductDetails", "Home",
+                    new { id = product.ProductID })">
+
+                    <img src="@Url.Content(product.ProductImage)"
+                         alt="@product.ProductName" />
+                </a>
+
+                <div>
+                    <h5>@product.ProductName</h5>
+
+                    <p class="prodSale">
+                        @product.ProductPrice.ToString("N0") VNĐ
+                    </p>
+                </div>
+            </li>
+        }
+    </ul>
+}

@@ -1,0 +1,787 @@
+﻿
+<!DOCTYPE html>
+
+@{
+    var cart = Session["Cart"] as _25dh110430_MyStore.Models.ViewModel.Cart;
+
+    var isLoggedIn = User.Identity.IsAuthenticated;
+    var username = isLoggedIn ? User.Identity.Name : "";
+
+    ViewBag.pmmodel = new _25dh110430_MyStore.Models.ViewModel.PersonalMenuVM
+    {
+        IsLoggedIn = isLoggedIn,
+        Username = username,
+        CartCount = cart != null && cart.Items != null
+            ? cart.Items.Count()
+            : 0
+    };
+}
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MyStore - @ViewBag.Title</title>
+
+    @Styles.Render("~/Content/css")
+    @RenderSection("Styles", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <style>
+
+        /* =====================================
+           TOÀN TRANG
+        ===================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            padding-top: 125px;
+            margin: 0;
+            background: #f5f5f5;
+            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            transition: color .2s ease;
+        }
+
+        /* =====================================
+           HEADER
+        ===================================== */
+
+        .navbar-fixed-top.shopee-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2000;
+            height: 125px;
+            min-height: 125px;
+            padding: 0;
+            margin: 0;
+            border: none !important;
+            border-radius: 0;
+            background: linear-gradient( to bottom, #f53d2d, #ff6633 ) !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        }
+
+        .shopee-header-inner {
+            max-width: 1200px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 8px;
+        }
+
+        /* =====================================
+           TOPBAR
+        ===================================== */
+
+        .shopee-topbar {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .shopee-top-left,
+        .shopee-top-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .shopee-topbar a {
+            color: #fff !important;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .shopee-topbar a:hover {
+                opacity: .8;
+            }
+
+        .shopee-top-divider {
+            opacity: .65;
+        }
+
+        /* =====================================
+           MAINBAR - LOGO VÀ GIỎ HÀNG
+        ===================================== */
+
+        .shopee-mainbar {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        /* LOGO */
+
+        .shopee-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff !important;
+            text-decoration: none !important;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: -.8px;
+        }
+
+            .shopee-logo i {
+                font-size: 48px;
+            }
+
+            .shopee-logo:hover {
+                color: #fff !important;
+                opacity: .9;
+            }
+
+        /* =====================================
+           GIỎ HÀNG
+        ===================================== */
+
+        .shopee-cart {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            height: 60px;
+            color: #fff !important;
+            text-decoration: none !important;
+            font-size: 36px;
+        }
+
+            .shopee-cart:hover {
+                color: #fff !important;
+                opacity: .85;
+            }
+
+        .shopee-cart-count {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 22px;
+            height: 20px;
+            padding: 1px 5px;
+            border-radius: 12px;
+            background: #fff;
+            color: #ee4d2d;
+            text-align: center;
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        /* =====================================
+           DROPDOWN TÀI KHOẢN
+        ===================================== */
+
+        .shopee-account {
+            position: relative;
+        }
+
+            .shopee-account .dropdown-content {
+                display: none;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                left: auto;
+                min-width: 190px;
+                padding: 7px 0;
+                background: #fff;
+                box-shadow: 0 3px 12px rgba(0,0,0,.18);
+                border-radius: 3px;
+                z-index: 3000;
+            }
+
+            .shopee-account:hover .dropdown-content {
+                display: block;
+            }
+
+            .shopee-account .dropdown-content a {
+                display: block;
+                padding: 10px 15px;
+                color: #333 !important;
+                text-decoration: none;
+                font-size: 13px;
+            }
+
+                .shopee-account .dropdown-content a:hover {
+                    background: #fff4f0;
+                    color: #ee4d2d !important;
+                }
+
+        /* =====================================
+           NỘI DUNG TRANG
+        ===================================== */
+
+        .bsg-main-wrapper {
+            min-height: 400px;
+            background: #f5f5f5;
+        }
+
+        .bsg-container {
+            width: 100%;
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 0 12px;
+        }
+
+        .bsg-card-container {
+            width: 100%;
+            background: transparent;
+            padding: 0;
+            border: 0;
+            box-shadow: none;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .bsg-footer {
+            width: 100%;
+            margin-top: 40px;
+            background: #fff;
+            color: #555;
+            border-top: 4px solid #ee4d2d;
+            font-size: 13px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 35px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 15px;
+        }
+
+        .footer-col h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            margin: 0 0 20px;
+        }
+
+        .footer-col p {
+            color: #777;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .footer-links li {
+                margin-bottom: 12px;
+            }
+
+            .footer-links a {
+                color: #777;
+                text-decoration: none;
+                font-size: 13px;
+            }
+
+                .footer-links a:hover {
+                    color: #ee4d2d;
+                }
+
+        /* =====================================
+           FOOTER COPYRIGHT
+        ===================================== */
+
+        .bsg-copyright {
+            background: #f5f5f5;
+            border-top: 1px solid #eee;
+            padding: 22px 15px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+            .bsg-copyright p {
+                margin: 0;
+            }
+
+        /* =====================================
+           TABLET
+        ===================================== */
+
+        @@media (max-width: 900px) {
+
+            body {
+                padding-top: 115px;
+            }
+
+            .navbar-fixed-top.shopee-header {
+                height: 115px;
+                min-height: 115px;
+            }
+
+            .shopee-topbar {
+                height: 40px;
+                font-size: 11px;
+            }
+
+            .shopee-mainbar {
+                height: 75px;
+            }
+
+            .shopee-logo {
+                font-size: 32px;
+            }
+
+                .shopee-logo i {
+                    font-size: 40px;
+                }
+
+            .footer-grid {
+                gap: 20px;
+            }
+        }
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @@media (max-width: 600px) {
+
+            body {
+                padding-top: 100px;
+            }
+
+            .navbar-fixed-top.shopee-header {
+                height: 100px;
+                min-height: 100px;
+            }
+
+            .shopee-header-inner {
+                padding: 0 12px;
+            }
+
+            .shopee-topbar {
+                height: 35px;
+                font-size: 10px;
+            }
+
+            .shopee-top-left {
+                display: none;
+            }
+
+            .shopee-top-right {
+                width: 100%;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
+                .shopee-top-right .hide-mobile {
+                    display: none;
+                }
+
+            .shopee-mainbar {
+                height: 65px;
+                padding: 0 5px;
+            }
+
+            .shopee-logo {
+                font-size: 28px;
+                gap: 8px;
+            }
+
+                .shopee-logo i {
+                    font-size: 34px;
+                }
+
+            .shopee-cart {
+                font-size: 29px;
+                width: 50px;
+            }
+
+            .shopee-cart-count {
+                min-width: 18px;
+                height: 17px;
+                line-height: 15px;
+                font-size: 10px;
+            }
+
+            .bsg-container {
+                padding: 0 8px;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 25px;
+                padding: 30px 15px;
+            }
+        }
+
+        /* =====================================
+           MOBILE NHỎ
+        ===================================== */
+
+        @@media (max-width: 400px) {
+
+            .shopee-top-right {
+                gap: 7px;
+            }
+
+            .shopee-topbar {
+                font-size: 9px;
+            }
+
+            .shopee-logo {
+                font-size: 25px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         HEADER MYSTORE
+    ===================================== -->
+
+    <header class="navbar navbar-default navbar-fixed-top shopee-header">
+
+        <div class="shopee-header-inner">
+
+            <!-- THANH THÔNG TIN TRÊN CÙNG -->
+
+            <div class="shopee-topbar">
+
+                <div class="shopee-top-left">
+
+                    <a href="#">
+                        Kênh Người Bán
+                    </a>
+
+                    <span class="shopee-top-divider">|</span>
+
+                    <a href="#">
+                        Tải ứng dụng
+                    </a>
+
+                    <span class="shopee-top-divider">|</span>
+
+                    <a href="#">
+                        Kết nối
+                        <i class="fab fa-facebook"></i>
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                </div>
+
+                <div class="shopee-top-right">
+
+                    <a href="#">
+                        <i class="far fa-bell"></i>
+                        Thông Báo
+                    </a>
+
+                    <a href="#">
+                        <i class="far fa-question-circle"></i>
+                        Hỗ Trợ
+                    </a>
+
+                    <a href="#">
+                        <i class="fas fa-globe"></i>
+                        Tiếng Việt
+                    </a>
+
+                    <span class="hide-mobile">|</span>
+
+                    <!-- TÀI KHOẢN -->
+
+                    <div class="dropdown shopee-account">
+
+                        <a href="javascript:void(0)">
+
+                            <i class="far fa-user-circle"></i>
+
+                            @if (ViewBag.pmmodel.IsLoggedIn)
+                            {
+                                @ViewBag.pmmodel.Username
+                            }
+                            else
+                            {
+                                <text>Tài khoản</text>
+                            }
+
+                            <i class="fas fa-angle-down"></i>
+
+                        </a>
+
+                        <div class="dropdown-content">
+
+                            @if (ViewBag.pmmodel.IsLoggedIn)
+                            {
+                                <a href="@Url.Action("Profile", "Account")">
+                                    Thông tin tài khoản
+                                </a>
+
+                                <a href="@Url.Action("OrderHistory", "Order")">
+                                    Lịch sử mua hàng
+                                </a>
+
+                                <a href="@Url.Action("Logout", "Account")">
+                                    Đăng xuất
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Register", "Account")">
+                                    Đăng ký
+                                </a>
+
+                                <a href="@Url.Action("Login", "Account")">
+                                    Đăng nhập
+                                </a>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGO VÀ GIỎ HÀNG -->
+
+            <div class="shopee-mainbar">
+
+                <!-- LOGO -->
+
+                <a href="@Url.Action("Index", "Home")"
+                   class="shopee-logo">
+
+                    <i class="fas fa-shopping-bag"></i>
+
+                    <span>MyStore</span>
+
+                </a>
+
+
+                <!-- GIỎ HÀNG -->
+
+                <a href="@Url.Action("Index", "Cart")"
+                   class="shopee-cart"
+                   title="Giỏ hàng">
+
+                    <i class="fas fa-shopping-cart"></i>
+
+                    <span class="shopee-cart-count" id="cart-count">
+                        @ViewBag.pmmodel.CartCount
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================
+         NỘI DUNG WEBSITE
+    ===================================== -->
+
+    <main class="bsg-main-wrapper">
+
+        <div class="bsg-container">
+
+            <div class="bsg-card-container">
+
+                @RenderBody()
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================
+         FOOTER MYSTORE
+    ===================================== -->
+
+    <footer class="bsg-footer">
+
+        <div class="bsg-container">
+
+            <div class="footer-grid">
+
+                <!-- CỘT 1 -->
+
+                <div class="footer-col">
+
+                    <h4>VỀ MYSTORE</h4>
+
+                    <p>
+                        MyStore chuyên cung cấp các sản phẩm
+                        balo laptop, balo du lịch, túi xách
+                        và phụ kiện với nhiều mẫu mã đa dạng.
+                    </p>
+
+                    <p>
+                        Chúng tôi luôn hướng đến chất lượng
+                        sản phẩm và trải nghiệm mua sắm tốt nhất
+                        cho khách hàng.
+                    </p>
+
+                </div>
+
+
+                <!-- CỘT 2 -->
+
+                <div class="footer-col">
+
+                    <h4>DANH MỤC SẢN PHẨM</h4>
+
+                    <ul class="footer-links">
+
+                        <li>
+                            <a href="@Url.Action("LapTop", "Products")">
+                                Balo Laptop
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("Travel", "Products")">
+                                Balo Du Lịch
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("Camera", "Products")">
+                                Balo Máy Ảnh
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("Soldier", "Products")">
+                                Balo Quân Đội
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- CỘT 3 -->
+
+                <div class="footer-col">
+
+                    <h4>CHÍNH SÁCH</h4>
+
+                    <ul class="footer-links">
+
+                        <li>
+                            <a href="#">
+                                Chính sách bảo hành
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#">
+                                Chính sách đổi trả
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#">
+                                Phương thức thanh toán
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#">
+                                Chính sách vận chuyển
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- CỘT 4 -->
+
+                <div class="footer-col">
+
+                    <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+
+                    <p>
+                        <i class="fas fa-phone-alt"></i>
+                        Hotline: Liên hệ cửa hàng
+                    </p>
+
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        Email: Liên hệ hỗ trợ
+                    </p>
+
+                    <p>
+                        <i class="fas fa-clock"></i>
+                        Thời gian hỗ trợ: Giờ hành chính
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COPYRIGHT -->
+
+        <div class="bsg-copyright">
+
+            <div class="bsg-container">
+
+                <p>
+                    &copy; @DateTime.Now.Year MyStore.
+                    Bản quyền thuộc về MyStore.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================
+         JAVASCRIPT
+    ===================================== -->
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
