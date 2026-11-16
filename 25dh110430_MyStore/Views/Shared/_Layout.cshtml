@@ -32,7 +32,6 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
     <style>
-
         /* =====================================
            TOÀN TRANG
         ===================================== */
@@ -42,7 +41,7 @@
         }
 
         body {
-            padding-top: 125px;
+            padding-top: 155px;
             margin: 0;
             background: #f5f5f5;
             color: #222;
@@ -50,7 +49,7 @@
         }
 
         a {
-            transition: color .2s ease;
+            transition: all .2s ease;
         }
 
         /* =====================================
@@ -63,17 +62,19 @@
             left: 0;
             right: 0;
             z-index: 2000;
-            height: 125px;
-            min-height: 125px;
+            width: 100%;
+            height: 155px;
+            min-height: 155px;
             padding: 0;
             margin: 0;
             border: none !important;
             border-radius: 0;
-            background: linear-gradient( to bottom, #f53d2d, #ff6633 ) !important;
-            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            background: linear-gradient(to bottom, #f53d2d, #ff6633) !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
         }
 
         .shopee-header-inner {
+            width: 100%;
             max-width: 1200px;
             height: 100%;
             margin: 0 auto;
@@ -183,6 +184,35 @@
             font-size: 12px;
             line-height: 18px;
         }
+
+        /* =====================================
+           DANH MỤC SẢN PHẨM TRÊN HEADER
+        ===================================== */
+
+        .shopee-categorybar {
+            height: 30px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 35px;
+            padding: 0 10px;
+            white-space: nowrap;
+            overflow: visible;
+        }
+
+            .shopee-categorybar a {
+                display: inline-block;
+                color: #fff !important;
+                text-decoration: none !important;
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+                .shopee-categorybar a:hover {
+                    color: #ffe0d6 !important;
+                    text-decoration: underline !important;
+                }
 
         /* =====================================
            DROPDOWN TÀI KHOẢN
@@ -305,7 +335,7 @@
                 }
 
         /* =====================================
-           FOOTER COPYRIGHT
+           COPYRIGHT
         ===================================== */
 
         .bsg-copyright {
@@ -328,12 +358,12 @@
         @@media (max-width: 900px) {
 
             body {
-                padding-top: 115px;
+                padding-top: 145px;
             }
 
             .navbar-fixed-top.shopee-header {
-                height: 115px;
-                min-height: 115px;
+                height: 145px;
+                min-height: 145px;
             }
 
             .shopee-topbar {
@@ -353,6 +383,15 @@
                     font-size: 40px;
                 }
 
+            .shopee-categorybar {
+                height: 30px;
+                gap: 20px;
+            }
+
+                .shopee-categorybar a {
+                    font-size: 12px;
+                }
+
             .footer-grid {
                 gap: 20px;
             }
@@ -365,12 +404,12 @@
         @@media (max-width: 600px) {
 
             body {
-                padding-top: 100px;
+                padding-top: 130px;
             }
 
             .navbar-fixed-top.shopee-header {
-                height: 100px;
-                min-height: 100px;
+                height: 130px;
+                min-height: 130px;
             }
 
             .shopee-header-inner {
@@ -421,6 +460,25 @@
                 line-height: 15px;
                 font-size: 10px;
             }
+
+            .shopee-categorybar {
+                height: 30px;
+                justify-content: flex-start;
+                gap: 18px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0 5px;
+                scrollbar-width: none;
+            }
+
+                .shopee-categorybar::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .shopee-categorybar a {
+                    font-size: 11px;
+                    flex-shrink: 0;
+                }
 
             .bsg-container {
                 padding: 0 8px;
@@ -602,6 +660,35 @@
 
             </div>
 
+
+            <!-- =====================================
+                 DANH MỤC SẢN PHẨM
+            ===================================== -->
+
+            <nav class="shopee-categorybar">
+
+                <a href="@Url.Action("LapTop", "Products")">
+                    Balo Laptop
+                </a>
+
+                <a href="@Url.Action("Travel", "Products")">
+                    Balo Du Lịch
+                </a>
+
+                <a href="@Url.Action("Camera", "Products")">
+                    Balo Máy Ảnh
+                </a>
+
+                <a href="@Url.Action("Soldier", "Products")">
+                    Balo Quân Đội
+                </a>
+
+                <a href="@Url.Action("TravelBag", "Products")">
+                    Túi Du Lịch
+                </a>
+
+            </nav>
+
         </div>
 
     </header>
@@ -636,7 +723,7 @@
 
             <div class="footer-grid">
 
-                <!-- CỘT 1 -->
+                <!-- CỘT 1: GIỚI THIỆU -->
 
                 <div class="footer-col">
 
@@ -657,7 +744,7 @@
                 </div>
 
 
-                <!-- CỘT 2 -->
+                <!-- CỘT 2: DANH MỤC -->
 
                 <div class="footer-col">
 
@@ -689,12 +776,18 @@
                             </a>
                         </li>
 
+                        <li>
+                            <a href="@Url.Action("TravelBag", "Products")">
+                                Túi Du Lịch
+                            </a>
+                        </li>
+
                     </ul>
 
                 </div>
 
 
-                <!-- CỘT 3 -->
+                <!-- CỘT 3: CHÍNH SÁCH -->
 
                 <div class="footer-col">
 
@@ -731,7 +824,7 @@
                 </div>
 
 
-                <!-- CỘT 4 -->
+                <!-- CỘT 4: HỖ TRỢ -->
 
                 <div class="footer-col">
 
