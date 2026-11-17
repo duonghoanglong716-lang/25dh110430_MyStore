@@ -1,120 +1,39 @@
-﻿@model IEnumerable<_25dh110430_MyStore.Models.Product>
+﻿
+@model IEnumerable<_25dh110430_MyStore.Models.Product>
 @using System.Linq
 
 @{
-    ViewBag.Title = ViewBag.CategoryName ?? "Balo Dựng Laptop";
+    ViewBag.Title = ViewBag.CategoryName;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
-    .camera-layout {
-        display: grid;
-        grid-template-columns: 250px minmax(0, 1fr);
-        gap: 25px;
+    .camera-page {
+        margin-top: 100px;
+        margin-bottom: 50px;
     }
 
-    .camera-sidebar {
-        background: white;
-        padding: 22px;
-        border-radius: 12px;
-        height: fit-content;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
-
-        .camera-sidebar h3 {
-            font-size: 17px;
-            font-weight: bold;
-            color: #263f53;
-            margin: 0 0 18px;
-        }
-
-    .camera-search-input {
-        width: 100%;
-        padding: 11px;
-        border: 1px solid #ddd;
-        border-radius: 7px;
-        margin-bottom: 12px;
-        outline: none;
-    }
-
-    .camera-search-button {
-        width: 100%;
-        padding: 11px;
-        border: none;
-        border-radius: 7px;
-        background: #263f53;
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-        .camera-search-button:hover {
-            background: #385b75;
-        }
-
-    .camera-sort-button {
-        display: block;
-        width: 100%;
-        padding: 9px 5px;
-        margin: 0;
-        border: none;
-        border-radius: 0;
-        background: transparent;
-        color: #555;
-        font-size: 14px;
-        font-weight: normal;
-        text-align: left;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-        .camera-sort-button:hover {
-            background: #f5f7f9;
-            color: #263f53;
-            padding-left: 12px;
-        }
-
-    .camera-reset-button {
-        display: block;
-        text-align: center;
-        margin-top: 10px;
-        padding: 9px;
-        color: #263f53;
-        background: #f1f3f5;
-        border-radius: 7px;
-        text-decoration: none;
-    }
-
-        .camera-reset-button:hover {
-            background: #e2e6ea;
-            color: #263f53;
-            text-decoration: none;
-        }
-
-    .camera-sidebar-divider {
-        margin: 22px 0;
-        border-top: 1px solid #eee;
-    }
-
-    .camera-main {
-        min-width: 0;
+    .camera-header {
+        margin-bottom: 25px;
     }
 
     .camera-result-title {
-        font-size: 25px;
+        font-size: 26px;
         font-weight: bold;
         color: #263f53;
-        margin-top: 0;
+        margin: 0 0 10px;
     }
 
     .camera-result-count {
         color: #777;
-        margin-bottom: 20px;
+        font-size: 14px;
+        margin: 0;
     }
 
+    /* DANH SÁCH SẢN PHẨM */
     .camera-product-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 22px;
     }
 
@@ -122,8 +41,9 @@
         background: white;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-        transition: 0.25s;
+        border: 1px solid #eee;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        transition: .25s;
     }
 
         .camera-product-item:hover {
@@ -132,7 +52,7 @@
         }
 
     .camera-product-image {
-        height: 220px;
+        height: 230px;
         background: #f7f9fa;
         display: flex;
         align-items: center;
@@ -163,37 +83,71 @@
 
     .camera-product-price {
         color: #e05252;
-        font-size: 18px;
+        font-size: 19px;
         font-weight: bold;
         margin-top: 12px;
+        margin-bottom: 12px;
     }
 
-    .camera-product-category {
-        color: #888;
+    .product-quantity-info {
         font-size: 13px;
+        line-height: 23px;
+        color: #777;
+        border-top: 1px solid #eee;
+        padding-top: 10px;
     }
+
+        .product-quantity-info .stock {
+            color: #2580c7;
+        }
+
+        .product-quantity-info .sold {
+            color: #168653;
+        }
+
+    .camera-product-link {
+        display: block;
+        text-decoration: none;
+    }
+
+        .camera-product-link:hover {
+            text-decoration: none;
+        }
 
     .camera-empty {
         background: white;
-        padding: 30px;
+        padding: 50px 20px;
         text-align: center;
         border-radius: 10px;
         color: #777;
     }
 
-    @@media (max-width: 992px) {
-        .camera-layout {
-            grid-template-columns: 210px minmax(0, 1fr);
+        .camera-empty i {
+            font-size: 35px;
+            color: #aaa;
         }
 
+        .camera-empty h4 {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+    /* TABLET */
+    @@media (max-width: 992px) {
         .camera-product-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .camera-product-image {
+            height: 190px;
         }
     }
 
+    /* MOBILE */
     @@media (max-width: 576px) {
-        .camera-layout {
-            grid-template-columns: 1fr;
+        .camera-page {
+            margin-top: 80px;
         }
 
         .camera-product-grid {
@@ -208,152 +162,107 @@
         .camera-product-info {
             padding: 10px;
         }
+
+        .camera-product-name {
+            font-size: 14px;
+            height: 40px;
+        }
+
+        .camera-product-price {
+            font-size: 16px;
+        }
     }
 </style>
 
-<div class="container" style="margin-top:100px;">
+<div class="container camera-page">
 
-    <div class="camera-layout">
+    <!-- TIÊU ĐỀ DANH MỤC -->
+    <div class="camera-header">
 
-        <!-- SIDEBAR BÊN TRÁI -->
-        <aside class="camera-sidebar">
+        <h2 class="camera-result-title">
+            @(ViewBag.CategoryName ?? "DANH SÁCH SẢN PHẨM")
+        </h2>
 
-            <h3>TÌM KIẾM SẢN PHẨM</h3>
-
-            <form action="@Url.Content("~/Products/Laptop")" method="get">
-
-                <input type="text"
-                       name="searchTerm"
-                       value="@Request.QueryString["searchTerm"]"
-                       class="camera-search-input"
-                       placeholder="Nhập tên sản phẩm..." />
-
-                <input type="hidden"
-                       name="sortOrder"
-                       value="@Request.QueryString["sortOrder"]" />
-
-                <button type="submit" class="camera-search-button">
-                    Tìm kiếm
-                </button>
-            </form>
-
-            <!-- ĐẶT LẠI -->
-            <a href="@Url.Content("~/Products/Laptop")"
-               class="camera-reset-button">
-                <i class="fa fa-refresh"></i>
-                Đặt lại
-            </a>
-
-            <hr class="camera-sidebar-divider" />
-
-            <!-- SẮP XẾP -->
-            <h3>SẮP XẾP SẢN PHẨM</h3>
-
-            <form action="@Url.Content("~/Products/Laptop")" method="get">
-
-                <input type="hidden"
-                       name="searchTerm"
-                       value="@Request.QueryString["searchTerm"]" />
-
-                <button type="submit" name="sortOrder"
-                        value="price_asc" class="camera-sort-button">
-                    Giá thấp đến cao
-                </button>
-
-                <button type="submit" name="sortOrder"
-                        value="price_desc" class="camera-sort-button">
-                    Giá cao đến thấp
-                </button>
-
-                <button type="submit" name="sortOrder"
-                        value="name_asc" class="camera-sort-button">
-                    Tên A - Z
-                </button>
-
-                <button type="submit" name="sortOrder"
-                        value="" class="camera-sort-button">
-                    Mặc định
-                </button>
-            </form>
-
-        </aside>
-
-        <!-- DANH SÁCH SẢN PHẨM -->
-        <main class="camera-main">
-
-            @if (Model != null && Model.Any())
+        <p class="camera-result-count">
+            @if (Model != null)
             {
-                <div class="camera-product-grid">
+                <span>Hiển thị @Model.Count() sản phẩm</span>
+            }
+        </p>
 
-                    @foreach (var product in Model)
-                    {
-                        <div class="camera-product-item">
+    </div>
 
-                            <a href="@Url.Action(
-                        "ProductDetails", "Home",
-                        new { id = product.ProductID })">
+    <!-- DANH SÁCH SẢN PHẨM -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="camera-product-grid">
 
-                                <div class="camera-product-image">
+            @foreach (var product in Model)
+            {
+                <div class="camera-product-item">
 
-                                    @if (!string.IsNullOrEmpty(product.ProductImage))
-                                    {
-                                        <img src="@product.ProductImage"
-                                             alt="@product.ProductName" />
-                                    }
+                    <a class="camera-product-link"
+                       href="@Url.Action("ProductDetails", "Home",
+                           new { id = product.ProductID })">
 
-                                </div>
-                            </a>
+                        <div class="camera-product-image">
 
-                            <div class="camera-product-info">
+                            @if (!string.IsNullOrEmpty(product.ProductImage))
+                            {
+                                <img src="@product.ProductImage"
+                                     alt="@product.ProductName" />
+                            }
+                            else
+                            {
+                                <span>Chưa có hình ảnh</span>
+                            }
 
-                                <div class="camera-product-name">
-                                    @product.ProductName
-                                </div>
+                        </div>
 
-                                <div class="camera-product-price">
-                                    @product.ProductPrice.ToString("N0") VNĐ
-                                </div>
+                        <div class="camera-product-info">
 
-                                <!-- SỐ LƯỢNG TỒN VÀ ĐÃ BÁN -->
-                                <div class="product-quantity-info">
+                            <div class="camera-product-name">
+                                @product.ProductName
+                            </div>
 
-                                    <span class="stock">
-                                       
-                                        Tồn kho: @product.StockQuantity
-                                    </span>
+                            <div class="camera-product-price">
+                                @product.ProductPrice.ToString("N0") VNĐ
+                            </div>
 
-                                    <br />
+                            <div class="product-quantity-info">
 
-                                    <span class="sold">
-                                       
-                                        Đã bán: @(product.OrderDetails?.Sum(x => x.Quantity) ?? 0)
-                                    </span>
+                                <span class="stock">
+                                    Tồn kho: @product.StockQuantity
+                                </span>
 
-                                </div>
+                                <br />
+
+                                <span class="sold">
+                                    Đã bán: @(product.OrderDetails?.Sum(x => x.Quantity) ?? 0)
+                                </span>
 
                             </div>
 
                         </div>
-                    }
 
-                </div>
-            }
-            else
-            {
-                <div class="camera-empty">
-
-                    <i class="glyphicon glyphicon-search"
-                       style="font-size:30px;"></i>
-
-                    <h4>Không tìm thấy sản phẩm</h4>
-
-                    <p>Vui lòng thử từ khóa tìm kiếm khác.</p>
+                    </a>
 
                 </div>
             }
 
-        </main>
+        </div>
+    }
+    else
+    {
+        <div class="camera-empty">
 
-    </div>
+            <i class="glyphicon glyphicon-search"></i>
+
+            <h4>Không tìm thấy sản phẩm</h4>
+
+            <p>Hiện tại chưa có sản phẩm nào trong danh mục này.</p>
+
+        </div>
+    }
+
 </div>
-

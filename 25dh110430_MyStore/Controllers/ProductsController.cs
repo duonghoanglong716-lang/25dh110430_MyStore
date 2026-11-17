@@ -60,49 +60,5 @@ namespace _25dh110430_MyStore.Controllers
 
             return View(products);
         }
-
-        public ActionResult TravelBag()
-        {
-            int categoryId = 1009;
-
-            var products = db.Products
-                .Where(p => p.CategoryID == categoryId)
-                .ToList();
-
-            return View(products);
-        }
-
-        public ActionResult CrossBodyBag()
-        {
-            int categoryId = 1010;
-
-            var products = db.Products
-                .Where(p => p.CategoryID == categoryId)
-                .ToList();
-
-            return View(products);
-        }
-
-        public ActionResult LaptopBag()
-        {
-            int categoryId = 1011;
-
-            var products = db.Products
-                .Where(p => p.CategoryID == categoryId)
-                .ToList();
-
-            return View(products);
-        }
-
-        public ActionResult CameraBag()
-        {
-            int categoryId = 1012;
-
-            var products = db.Products
-                .Where(p => p.CategoryID == categoryId)
-                .ToList();
-
-            return View(products);
-        }
     }
 }

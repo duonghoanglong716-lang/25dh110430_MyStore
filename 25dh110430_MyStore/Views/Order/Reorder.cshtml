@@ -1,0 +1,264 @@
+﻿
+@model IEnumerable<_25dh110430_MyStore.Models.Order>
+
+@{
+    Layout = null;
+    ViewBag.Title = "Đặt hàng lại";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Đặt hàng lại - MyStore</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .reorder-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 15px;
+        }
+
+        .reorder-header {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 5px solid #ee4d2d;
+        }
+
+            .reorder-header h2 {
+                color: #ee4d2d;
+                font-weight: bold;
+                margin: 0 0 10px;
+            }
+
+            .reorder-header p {
+                color: #777;
+                margin: 0;
+            }
+
+        .order-card {
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-code {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-status {
+            color: #26aa99;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f3f3;
+        }
+
+        .product-info {
+            flex: 1;
+            padding: 0 15px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .product-quantity {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .product-price {
+            color: #ee4d2d;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .order-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-top: 20px;
+        }
+
+        .total-price {
+            color: #ee4d2d;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .btn-reorder {
+            background: #ee4d2d;
+            color: white;
+            border: 1px solid #ee4d2d;
+            padding: 10px 25px;
+            border-radius: 3px;
+            transition: .2s;
+        }
+
+            .btn-reorder:hover {
+                background: #d73211;
+                color: white;
+            }
+
+        .empty-order {
+            background: white;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 5px;
+            color: #999;
+        }
+
+            .empty-order span {
+                font-size: 55px;
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .empty-order a {
+                display: inline-block;
+                margin-top: 15px;
+                background: #ee4d2d;
+                color: white;
+                padding: 10px 25px;
+                text-decoration: none;
+                border-radius: 3px;
+            }
+
+        @@media (max-width: 600px) {
+            .product-item {
+                align-items: flex-start;
+            }
+
+                .product-item img {
+                    width: 65px !important;
+                    height: 65px !important;
+                }
+
+            .order-bottom {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reorder-container">
+
+        <div class="reorder-header">
+            <h2>ĐẶT HÀNG LẠI</h2>
+            <p>Xem lại các đơn hàng trước đây và nhanh chóng mua lại sản phẩm yêu thích.</p>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var order in Model)
+            {
+                <div class="order-card">
+
+                    <div class="order-top">
+                        <div>
+                            <span class="order-code">Mã đơn hàng: #@order.OrderID</span>
+                            <br />
+                            <small>Đơn hàng của bạn</small>
+                        </div>
+
+                        <div class="order-status">
+                            Đơn hàng đã đặt
+                        </div>
+                    </div>
+
+                    @if (order.OrderDetails != null)
+                    {
+                        foreach (var detail in order.OrderDetails)
+                        {
+                            <div class="product-item">
+
+                                <div class="product-info">
+                                    <div class="product-name">
+                                        @(detail.Product != null ? detail.Product.ProductName : "Sản phẩm")
+                                    </div>
+
+                                    <div class="product-quantity">
+                                        Số lượng: @detail.Quantity
+                                    </div>
+                                </div>
+
+                                <div class="product-price">
+                                    @if (detail.Product != null)
+                                    {
+                                        @String.Format("{0:N0} ₫", detail.Product.ProductPrice)
+                                    }
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+                    <div class="order-bottom">
+                        <div>
+                            <span>Tổng đơn hàng: </span>
+                            <span class="total-price">
+                                @String.Format("{0:N0} ₫", order.OrderDetails.Sum(x => x.Quantity * x.Product.ProductPrice))
+                            </span>
+                        </div>
+
+                        <div>
+                            <a href="@Url.Action("Reorder", "Order", new { id = order.OrderID })"
+                               class="btn btn-reorder">
+                                <i class="glyphicon glyphicon-shopping-cart"></i>
+                                Mua lại
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-order">
+                <span class="glyphicon glyphicon-shopping-cart"></span>
+                <h3>Bạn chưa có đơn hàng nào</h3>
+                <p>Hãy khám phá các sản phẩm tại MyStore và trải nghiệm mua sắm nhé!</p>
+
+                <a href="@Url.Action("Index", "Home")">
+                    Tiếp tục mua sắm
+                </a>
+            </div>
+        }
+
+    </div>
+</body>
+</html>

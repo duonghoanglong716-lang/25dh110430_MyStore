@@ -322,13 +322,10 @@
     <Content Include="Views\Products\LapTop.cshtml" />
     <Content Include="Views\Products\Camera.cshtml" />
     <Content Include="Views\Products\Soldier.cshtml" />
-    <Content Include="Views\Products\TravelBag.cshtml" />
-    <Content Include="Views\Products\CrossBodyBag.cshtml" />
-    <Content Include="Views\Products\LaptopBag.cshtml" />
-    <Content Include="Views\Products\CameraBag.cshtml" />
     <Content Include="Views\Order\OrderHistory.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Order\Reorder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

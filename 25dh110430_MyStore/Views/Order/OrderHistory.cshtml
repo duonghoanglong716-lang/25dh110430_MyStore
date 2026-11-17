@@ -406,12 +406,12 @@
 
                                     <td>
                                         @Html.ActionLink(
-                                                           "Xem chi tiết",
-                                                           "OrderSuccess",
-                                                           "Order",
-                                                           new { id = order.OrderID },
-                                                           new { @class = "btn-detail" }
-                                                       )
+                                                                          "Xem chi tiết",
+                                                                          "OrderSuccess",
+                                                                          "Order",
+                                                                          new { id = order.OrderID },
+                                                                          new { @class = "btn-detail" }
+                                                                      )
 
                                         @if (order.OrderStatus == "Chờ xác nhận")
                                         {
@@ -433,7 +433,9 @@
                                         }
 
                                         <!--nút đặt lại-->
-                                        @if (order.OrderStatus == "Đã hủy")
+
+                                        @if (order.OrderStatus == "Đã hủy" ||
+                                             order.OrderStatus == "Đã giao hàng")
                                         {
                                             <form action="@Url.Action("Reorder", "Order")"
                                                   method="post"
@@ -441,15 +443,20 @@
 
                                                 @Html.AntiForgeryToken()
 
-                                                <input type="hidden" name="id" value="@order.OrderID" />
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@order.OrderID" />
 
-                                                <button type="submit" class="btn-detail"
+                                                <button type="submit"
+                                                        class="btn-detail"
                                                         onclick="return confirm('Bạn muốn đặt lại đơn hàng này?');">
+
                                                     <i class="glyphicon glyphicon-repeat"></i>
                                                     Đặt lại
                                                 </button>
                                             </form>
                                         }
+
                                     </td>
                                 </tr>
                             }

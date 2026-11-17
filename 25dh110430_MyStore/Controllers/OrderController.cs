@@ -376,5 +376,152 @@ namespace _25dh110430_MyStore.Controllers
             }
         }
 
+
+        // POST: Order/Reorder
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Reorder(int id)
+        {
+            // 1. Kiểm tra đăng nhập
+            var username = User.Identity.Name;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 2. Tìm khách hàng
+            var customer = db.Customers
+                .FirstOrDefault(c => c.Username == username);
+
+            if (customer == null)
+            {
+                TempData["Error"] = "Không tìm thấy khách hàng.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // 3. Lấy đơn hàng cũ của khách hàng
+            var oldOrder = db.Orders
+                .Include(o => o.OrderDetails.Select(d => d.Product))
+                .Include(o => o.OrderDetails.Select(d => d.ProductColor))
+                .FirstOrDefault(o =>
+                    o.OrderID == id &&
+                    o.CustomerID == customer.CustomerID
+                );
+
+            if (oldOrder == null)
+            {
+                TempData["Error"] = "Không tìm thấy đơn hàng.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // 4. Lấy chi tiết đơn hàng
+            var oldDetails = db.OrderDetails
+                .Where(d => d.OrderID == id)
+                .ToList();
+
+            if (!oldDetails.Any())
+            {
+                TempData["Error"] = "Đơn hàng không có sản phẩm.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // 5. Lấy dịch vụ giỏ hàng
+            var cartService = new CartService(Session);
+            var cart = cartService.GetCart();
+
+            // 6. Kiểm tra toàn bộ sản phẩm và tồn kho
+            foreach (var detail in oldDetails)
+            {
+                var product = db.Products.Find(detail.ProductID);
+
+                if (product == null)
+                {
+                    TempData["Error"] =
+                        "Sản phẩm ID " + detail.ProductID + " không còn tồn tại.";
+
+                    return RedirectToAction("OrderHistory");
+                }
+
+                // Tính số lượng cần thêm, bao gồm sản phẩm đã có trong giỏ
+                var existingItem = cart.Items.FirstOrDefault(x =>
+                    x.ProductID == detail.ProductID &&
+                    x.ProductColorID == detail.ProductColorID
+                );
+
+                int currentQuantity = existingItem != null
+                    ? existingItem.Quantity
+                    : 0;
+
+                if (currentQuantity + detail.Quantity > product.StockQuantity)
+                {
+                    TempData["Error"] =
+                        "Sản phẩm " + product.ProductName +
+                        " không đủ tồn kho. Số lượng còn lại: " +
+                        product.StockQuantity;
+
+                    return RedirectToAction("OrderHistory");
+                }
+            }
+
+            // 7. Thêm sản phẩm vào giỏ hàng
+            foreach (var detail in oldDetails)
+            {
+                var product = db.Products.Find(detail.ProductID);
+
+                // Lấy lại màu sắc
+                string colorName = null;
+                string productImage = product.ProductImage;
+
+                if (detail.ProductColorID.HasValue)
+                {
+                    var selectedColor = db.ProductColors
+                        .Include("ProductImages")
+                        .FirstOrDefault(c =>
+                            c.ProductColorID == detail.ProductColorID.Value &&
+                            c.ProductID == product.ProductID
+                        );
+
+                    if (selectedColor == null)
+                    {
+                        TempData["Error"] =
+                            "Màu sắc của sản phẩm " +
+                            product.ProductName + " không còn tồn tại.";
+
+                        return RedirectToAction("OrderHistory");
+                    }
+
+                    colorName = selectedColor.ColorName;
+
+                    var colorImage = selectedColor.ProductImages.FirstOrDefault();
+
+                    if (colorImage != null &&
+                        !string.IsNullOrEmpty(colorImage.ImagePath))
+                    {
+                        productImage = colorImage.ImagePath;
+                    }
+                }
+
+                // Thêm bằng phương thức AddItem hiện tại của bạn
+                cart.AddItem(
+                    product.ProductID,
+                    productImage,
+                    product.ProductName,
+                    detail.UnitPrice,
+                    detail.Quantity,
+                    product.Category.CategoryName,
+                    detail.ProductColorID,
+                    colorName
+                );
+            }
+
+            TempData["Success"] =
+                "Đã thêm sản phẩm từ đơn hàng #" +
+                oldOrder.OrderID + " vào giỏ hàng.";
+
+            // 8. Chuyển đến giỏ hàng
+            return RedirectToAction("Index", "Cart");
+        }
+
     }
 }
