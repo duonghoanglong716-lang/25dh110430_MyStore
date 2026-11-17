@@ -376,6 +376,23 @@
 
         <h2>GIỎ HÀNG</h2>
 
+        @* THÔNG BÁO KHI MUA LẠI ĐƠN HÀNG *@
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="glyphicon glyphicon-ok-circle"></i>
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="glyphicon glyphicon-exclamation-sign"></i>
+                @TempData["Error"]
+            </div>
+        }
+
         @if (Model == null || !Model.Items.Any())
         {
             <div class="empty-cart">

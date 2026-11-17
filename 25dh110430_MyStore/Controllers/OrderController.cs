@@ -377,6 +377,8 @@ namespace _25dh110430_MyStore.Controllers
         }
 
 
+
+
         // POST: Order/Reorder
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -400,7 +402,7 @@ namespace _25dh110430_MyStore.Controllers
                 return RedirectToAction("OrderHistory");
             }
 
-            // 3. Lấy đơn hàng cũ của khách hàng
+            // 3. Lấy đơn hàng cũ thuộc khách hàng hiện tại
             var oldOrder = db.Orders
                 .Include(o => o.OrderDetails.Select(d => d.Product))
                 .Include(o => o.OrderDetails.Select(d => d.ProductColor))
@@ -415,10 +417,16 @@ namespace _25dh110430_MyStore.Controllers
                 return RedirectToAction("OrderHistory");
             }
 
-            // 4. Lấy chi tiết đơn hàng
-            var oldDetails = db.OrderDetails
-                .Where(d => d.OrderID == id)
-                .ToList();
+            // 4. Chỉ cho phép mua lại đơn đã hủy
+            if (oldOrder.OrderStatus == null ||
+                oldOrder.OrderStatus.Trim() != "Đã hủy")
+            {
+                TempData["Error"] = "Chỉ có thể mua lại đơn hàng đã hủy.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // 5. Lấy chi tiết đơn hàng cũ
+            var oldDetails = oldOrder.OrderDetails.ToList();
 
             if (!oldDetails.Any())
             {
@@ -426,53 +434,90 @@ namespace _25dh110430_MyStore.Controllers
                 return RedirectToAction("OrderHistory");
             }
 
-            // 5. Lấy dịch vụ giỏ hàng
+            // 6. Lấy giỏ hàng hiện tại
             var cartService = new CartService(Session);
             var cart = cartService.GetCart();
 
-            // 6. Kiểm tra toàn bộ sản phẩm và tồn kho
-            foreach (var detail in oldDetails)
+            if (cart == null || cart.Items == null)
             {
-                var product = db.Products.Find(detail.ProductID);
+                TempData["Error"] = "Không thể lấy giỏ hàng.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // 7. KIỂM TRA TỒN KHO TRƯỚC KHI XÓA GIỎ HÀNG
+            // Gộp các dòng có cùng sản phẩm và màu sắc
+            var groupedDetails = oldDetails
+                .GroupBy(d => new
+                {
+                    d.ProductID,
+                    d.ProductColorID
+                })
+                .ToList();
+
+            foreach (var group in groupedDetails)
+            {
+                var product = db.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefault(p => p.ProductID == group.Key.ProductID);
 
                 if (product == null)
                 {
                     TempData["Error"] =
-                        "Sản phẩm ID " + detail.ProductID + " không còn tồn tại.";
+                        "Sản phẩm ID " + group.Key.ProductID +
+                        " không còn tồn tại.";
 
                     return RedirectToAction("OrderHistory");
                 }
 
-                // Tính số lượng cần thêm, bao gồm sản phẩm đã có trong giỏ
-                var existingItem = cart.Items.FirstOrDefault(x =>
-                    x.ProductID == detail.ProductID &&
-                    x.ProductColorID == detail.ProductColorID
-                );
+                // Tổng số lượng cần mua lại
+                int quantity = group.Sum(d => d.Quantity);
 
-                int currentQuantity = existingItem != null
-                    ? existingItem.Quantity
-                    : 0;
-
-                if (currentQuantity + detail.Quantity > product.StockQuantity)
+                if (quantity > product.StockQuantity)
                 {
                     TempData["Error"] =
                         "Sản phẩm " + product.ProductName +
-                        " không đủ tồn kho. Số lượng còn lại: " +
-                        product.StockQuantity;
+                        " không đủ tồn kho. Hiện còn " +
+                        product.StockQuantity + " sản phẩm, " +
+                        "bạn cần " + quantity + " sản phẩm.";
 
                     return RedirectToAction("OrderHistory");
                 }
+
+                // Kiểm tra màu sắc
+                if (group.Key.ProductColorID.HasValue)
+                {
+                    var selectedColor = db.ProductColors.FirstOrDefault(c =>
+                        c.ProductColorID == group.Key.ProductColorID.Value &&
+                        c.ProductID == product.ProductID
+                    );
+
+                    if (selectedColor == null)
+                    {
+                        TempData["Error"] =
+                            "Màu sắc của sản phẩm " +
+                            product.ProductName +
+                            " không còn tồn tại.";
+
+                        return RedirectToAction("OrderHistory");
+                    }
+                }
             }
 
-            // 7. Thêm sản phẩm vào giỏ hàng
+            // 8. TẤT CẢ SẢN PHẨM ĐỀU ĐỦ HÀNG
+            // Bây giờ mới xóa toàn bộ giỏ hàng cũ
+            cart.Clear();
+
+            // 9. Thêm lại sản phẩm từ đơn hàng cũ
             foreach (var detail in oldDetails)
             {
-                var product = db.Products.Find(detail.ProductID);
+                var product = db.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefault(p => p.ProductID == detail.ProductID);
 
-                // Lấy lại màu sắc
                 string colorName = null;
                 string productImage = product.ProductImage;
 
+                // Lấy màu sắc và hình ảnh cũ
                 if (detail.ProductColorID.HasValue)
                 {
                     var selectedColor = db.ProductColors
@@ -482,44 +527,41 @@ namespace _25dh110430_MyStore.Controllers
                             c.ProductID == product.ProductID
                         );
 
-                    if (selectedColor == null)
+                    if (selectedColor != null)
                     {
-                        TempData["Error"] =
-                            "Màu sắc của sản phẩm " +
-                            product.ProductName + " không còn tồn tại.";
+                        colorName = selectedColor.ColorName;
 
-                        return RedirectToAction("OrderHistory");
-                    }
+                        var colorImage = selectedColor.ProductImages
+                            .FirstOrDefault();
 
-                    colorName = selectedColor.ColorName;
-
-                    var colorImage = selectedColor.ProductImages.FirstOrDefault();
-
-                    if (colorImage != null &&
-                        !string.IsNullOrEmpty(colorImage.ImagePath))
-                    {
-                        productImage = colorImage.ImagePath;
+                        if (colorImage != null &&
+                            !string.IsNullOrEmpty(colorImage.ImagePath))
+                        {
+                            productImage = colorImage.ImagePath;
+                        }
                     }
                 }
 
-                // Thêm bằng phương thức AddItem hiện tại của bạn
+                // Thêm đúng sản phẩm, màu sắc, giá và số lượng cũ
                 cart.AddItem(
                     product.ProductID,
                     productImage,
                     product.ProductName,
                     detail.UnitPrice,
                     detail.Quantity,
-                    product.Category.CategoryName,
+                    product.Category != null
+                        ? product.Category.CategoryName
+                        : "",
                     detail.ProductColorID,
                     colorName
                 );
             }
 
+            // 10. Thông báo thành công
             TempData["Success"] =
-                "Đã thêm sản phẩm từ đơn hàng #" +
-                oldOrder.OrderID + " vào giỏ hàng.";
+                "Đã thay thế giỏ hàng bằng sản phẩm từ đơn hàng #" +
+                oldOrder.OrderID + " thành công!";
 
-            // 8. Chuyển đến giỏ hàng
             return RedirectToAction("Index", "Cart");
         }
 

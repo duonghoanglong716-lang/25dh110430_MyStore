@@ -30,6 +30,7 @@ namespace _25dh110430_MyStore.Controllers
         }
 
         // Thêm sản phẩm vào giỏ hàng
+
         [HttpPost]
         public ActionResult AddToCart(int id, int quantity = 1, int? productColorId = null)
         {
@@ -41,51 +42,26 @@ namespace _25dh110430_MyStore.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // KIỂM TRA SỐ LƯỢNG TỒN KHO TẠI ĐÂY
-            if (product.StockQuantity <= 0)
-            {
-                TempData["Error"] = "Số lượng sản phẩm đã hết!";
-                return RedirectToAction("Index", "Home");
-            }
-
             if (quantity <= 0)
             {
                 TempData["Error"] = "Số lượng không hợp lệ!";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ProductDetails", "Home", new { id = id });
             }
 
-            // Kiểm tra sản phẩm
-            if (product == null)
-            {
-                TempData["Error"] = "Không tìm thấy sản phẩm!";
-                return RedirectToAction("Index", "Home");
-            }
-
-            // Kiểm tra số lượng
             if (product.StockQuantity <= 0)
             {
                 TempData["Error"] = "Sản phẩm đã hết hàng!";
                 return RedirectToAction("ProductDetails", "Home", new { id = id });
             }
 
-            if (quantity > product.StockQuantity)
-            {
-                TempData["Error"] = "Số lượng vượt quá tồn kho!";
-                return RedirectToAction("ProductDetails", "Home", new { id = id });
-            }
+            // Lấy giỏ hàng hiện tại
+            var cartService = GetCartService();
+            var cart = cartService.GetCart();
 
-            // Kiểm tra tồn kho
-            if (product.StockQuantity <= 0 || quantity > product.StockQuantity)
-            {
-                TempData["Error"] = "Số lượng sản phẩm không hợp lệ hoặc vượt quá tồn kho!";
-                return RedirectToAction("ProductDetails", "Home", new { id = id });
-            }
-
-            // Khởi tạo thông tin màu
+            // Kiểm tra màu sắc
             string colorName = null;
             string productImage = product.ProductImage;
 
-            // Kiểm tra màu được chọn
             if (productColorId.HasValue)
             {
                 var selectedColor = db.ProductColors
@@ -102,9 +78,7 @@ namespace _25dh110430_MyStore.Controllers
 
                 colorName = selectedColor.ColorName;
 
-                // Lấy hình ảnh đầu tiên của màu được chọn
-                var colorImage = selectedColor.ProductImages
-                    .FirstOrDefault();
+                var colorImage = selectedColor.ProductImages.FirstOrDefault();
 
                 if (colorImage != null &&
                     !String.IsNullOrEmpty(colorImage.ImagePath))
@@ -118,10 +92,24 @@ namespace _25dh110430_MyStore.Controllers
                 return RedirectToAction("ProductDetails", "Home", new { id = id });
             }
 
-            // Thêm sản phẩm vào giỏ hàng
-            var cartService = GetCartService();
+            // Tìm sản phẩm cùng mã và cùng màu đã có trong giỏ
+            var existingItem = cart.Items.FirstOrDefault(i =>
+                i.ProductID == product.ProductID &&
+                i.ProductColorID == productColorId);
 
-            cartService.GetCart().AddItem(
+            // Tính tổng số lượng sau khi thêm
+            int currentQuantity = existingItem != null
+                ? existingItem.Quantity
+                : 0;
+
+            if (currentQuantity + quantity > product.StockQuantity)
+            {
+                TempData["Error"] = "Số lượng trong giỏ vượt quá số lượng tồn kho!";
+                return RedirectToAction("ProductDetails", "Home", new { id = id });
+            }
+
+            // Thêm sản phẩm vào giỏ
+            cart.AddItem(
                 product.ProductID,
                 productImage,
                 product.ProductName,
@@ -133,9 +121,9 @@ namespace _25dh110430_MyStore.Controllers
             );
 
             TempData["Success"] = "Đã thêm sản phẩm vào giỏ hàng!";
-
             return RedirectToAction("Index");
         }
+
 
 
 
@@ -154,13 +142,41 @@ namespace _25dh110430_MyStore.Controllers
             return RedirectToAction("Index");
         }
 
+
         [HttpPost]
-        public ActionResult UpdateQuantity(int id, int quantity)
+        public ActionResult UpdateQuantity(
+            int id,
+            int quantity,
+            int? productColorId = null)
         {
-            var cartService = GetCartService();
-            cartService.GetCart().UpdateQuantity(id, quantity);
+            var product = db.Products.Find(id);
+
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm!";
+                return RedirectToAction("Index");
+            }
+
+            if (quantity < 1)
+            {
+                TempData["Error"] = "Số lượng không hợp lệ!";
+                return RedirectToAction("Index");
+            }
+
+            if (quantity > product.StockQuantity)
+            {
+                TempData["Error"] = "Số lượng vượt quá tồn kho!";
+                return RedirectToAction("Index");
+            }
+
+            var cart = GetCartService().GetCart();
+
+            cart.UpdateQuantity(id, quantity, productColorId);
+
+            TempData["Success"] = "Đã cập nhật số lượng sản phẩm!";
             return RedirectToAction("Index");
         }
+
 
         // Hiển thị giỏ hàng đã gom nhóm sản phẩm theo danh mục và hỗ trợ sản phẩm tương tự/phân trang
         public ActionResult Index2(int? page)
